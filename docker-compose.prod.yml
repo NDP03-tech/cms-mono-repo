@@ -1,0 +1,79 @@
+# docker-compose.prod.yml — đặt ở project root
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cms_postgres_prod
+    restart: always
+    environment:
+      POSTGRES_DB: cms_prod
+      POSTGRES_USER: cms_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - cms_prod_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cms_user -d cms_prod"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: cms_redis_prod
+    restart: always
+    volumes:
+      - redis_prod_data:/data
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf --requirepass ${REDIS_PASSWORD}
+    networks:
+      - cms_prod_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./cms-backend
+      dockerfile: Dockerfile.prod
+    container_name: cms_backend_prod
+    restart: always
+    env_file:
+      - ./cms-backend/.env.prod
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - cms_prod_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: cms_nginx_prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - backend
+    networks:
+      - cms_prod_network
+
+volumes:
+  postgres_prod_data:
+  redis_prod_data:
+  nginx_logs:
+
+networks:
+  cms_prod_network:
+    driver: bridge

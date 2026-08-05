@@ -1,0 +1,85 @@
+# docker-compose.dev.yml — đặt ở project root (ngoài cms-backend)
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cms_postgres_dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cms_dev
+      POSTGRES_USER: cms_user
+      POSTGRES_PASSWORD: cms_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - cms_dev_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cms_user -d cms_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: cms_redis_dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_dev_data:/data
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - cms_dev_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./cms-backend
+      dockerfile: Dockerfile.dev
+    container_name: cms_backend_dev
+    restart: unless-stopped
+    env_file:
+      - ./cms-backend/.env.dev
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./cms-backend:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - cms_dev_network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: cms_pgadmin_dev
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@cms.dev
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - cms_dev_network
+
+volumes:
+  postgres_dev_data:
+  redis_dev_data:
+
+networks:
+  cms_dev_network:
+    driver: bridge
