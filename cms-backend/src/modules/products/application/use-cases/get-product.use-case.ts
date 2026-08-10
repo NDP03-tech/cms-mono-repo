@@ -5,7 +5,7 @@ import { Product } from '../../domain/entities/product.entity';
 
 @Injectable()
 export class GetProductUseCase {
-  private constructor(
+  constructor(
     @Inject(PRODUCT_REPOSITORY) private readonly repo: IProductRepository,
   ) {}
 

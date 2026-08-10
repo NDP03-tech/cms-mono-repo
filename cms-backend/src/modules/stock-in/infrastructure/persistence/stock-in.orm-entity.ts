@@ -32,7 +32,10 @@ export class StockInOrmEntity {
   @Column({ length: 10 })
   currency: string;
 
-  @Column({ nullable: true })
+  @Column({
+    type: 'timestamptz',
+    nullable: true,
+  })
   approvedAt: Date | null;
 
   @CreateDateColumn()

@@ -12,10 +12,11 @@ import { GetStockInUseCase } from './application/use-cases/get-stock-in';
 import { ListStockInsUseCase } from './application/use-cases/list-stock-ins';
 import { StockInRepository } from './infrastructure/repositories/stock-in.repository';
 import { StockInOrmEntity } from './infrastructure/persistence/stock-in.orm-entity';
+import { StockInItemOrmEntity } from './infrastructure/persistence/stock-in-item.orm-entity';
 import { STOCK_IN_REPOSITORY } from './domain/repositories/stock-in.repository.interface';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([StockInOrmEntity])],
+  imports: [TypeOrmModule.forFeature([StockInOrmEntity, StockInItemOrmEntity])],
   controllers: [StockInController],
   providers: [
     CreateStockInUseCase,

@@ -9,13 +9,25 @@ export class SupplierOrmEntity {
   @Column()
   name: string;
 
-  @Column({ nullable: true })
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    unique: true,
+  })
   phone: string | null;
 
-  @Column({ nullable: true })
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    unique: true,
+  })
   address: string | null;
 
-  @Column({ nullable: true })
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    unique: true,
+  })
   email: string | null;
 
   @Column({ default: true })

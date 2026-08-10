@@ -8,12 +8,12 @@ import { Product } from '../../domain/entities/product.entity';
 
 @Injectable()
 export class CreateProductUseCase {
-  private constructor(
+  constructor(
     @Inject(PRODUCT_REPOSITORY) private readonly repo: IProductRepository,
   ) {}
 
   async execute(props: CreateProductInput) {
-    const skuExist = this.repo.findBySku(SKU.create(props.sku));
+    const skuExist = await this.repo.findBySku(SKU.create(props.sku));
     if (skuExist) throw new Error(`SKU ${skuExist} da ton tai roi`);
     const product = Product.create({
       sku: props.sku,

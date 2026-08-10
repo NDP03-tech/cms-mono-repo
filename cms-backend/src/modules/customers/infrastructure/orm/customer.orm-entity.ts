@@ -8,10 +8,17 @@ export class CustomerOrmEntity {
   @Column()
   name: string;
 
-  @Column({ nullable: true })
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
   phone: string | null;
 
-  @Column({ nullable: true, unique: true })
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    unique: true,
+  })
   email: string | null;
 
   @Column({ default: true })

@@ -3,7 +3,7 @@ import { PRODUCT_REPOSITORY } from '../../domain/repositories/product.repository
 import type { IProductRepository } from '../../domain/repositories/product.repository.interface';
 @Injectable()
 export class DeleteProductUseCase {
-  private constructor(
+  constructor(
     @Inject(PRODUCT_REPOSITORY) private readonly repo: IProductRepository,
   ) {}
 

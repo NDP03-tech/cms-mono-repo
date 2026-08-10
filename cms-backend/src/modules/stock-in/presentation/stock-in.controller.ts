@@ -7,6 +7,7 @@ import {
   Param,
   Body,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateStockInUseCase } from '../application/use-cases/create-stock-in';
 import { AddStockInItemUseCase } from '../application/use-cases/add-stock-in-item';
@@ -17,6 +18,10 @@ import { ApproveStockInUseCase } from '../application/use-cases/approve-stock-in
 import { RejectStockInUseCase } from '../application/use-cases/reject-stock-in';
 import { GetStockInUseCase } from '../application/use-cases/get-stock-in';
 import { ListStockInsUseCase } from '../application/use-cases/list-stock-ins';
+import { JwtAuthGuard } from '../../auth/infrastructure/guards/jwt-auth.guard';
+import { RolesGuard } from '../../auth/infrastructure/guards/role.guard';
+import { Roles } from '../../../shared/decorators/role.decorator';
+import { Role } from '../../auth/domain/enums/roles.enum';
 import type {
   CreateStockInInput,
   CreateStockInItemInput,
@@ -25,6 +30,7 @@ import type { UpdateStockInItemInput } from '../application/dto/update-stock-in-
 import type { StockInFiltersInput } from '../application/dto/stock-in-filters.input';
 
 @Controller('stock-in')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class StockInController {
   constructor(
     private readonly createStockIn: CreateStockInUseCase,
@@ -98,11 +104,13 @@ export class StockInController {
   }
 
   @Patch(':id/approve')
+  @Roles(Role.ADMIN)
   approve(@Param('id') id: string) {
     return this.approveStockIn.execute(id);
   }
 
   @Patch(':id/reject')
+  @Roles(Role.ADMIN)
   reject(@Param('id') id: string) {
     return this.rejectStockIn.execute(id);
   }

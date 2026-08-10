@@ -5,7 +5,7 @@ import { UpdateProductInput } from '../dtos/update-product.input';
 
 @Injectable()
 export class UpdateProductUseCase {
-  private constructor(
+  constructor(
     @Inject(PRODUCT_REPOSITORY) private readonly repo: IProductRepository,
   ) {}
   async execute(id: string, input: UpdateProductInput) {

@@ -5,7 +5,7 @@ import type { IProductRepository } from '../../domain/repositories/product.repos
 import { ProductFiltersInput } from '../dtos/product-filters.input';
 @Injectable()
 export class ListProductsUseCase {
-  private constructor(
+  constructor(
     @Inject(PRODUCT_REPOSITORY) private readonly repo: IProductRepository,
   ) {}
 

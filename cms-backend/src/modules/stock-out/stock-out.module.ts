@@ -12,10 +12,13 @@ import { GetStockOutUseCase } from './application/use-cases/get-stock-out.use-ca
 import { ListStockOutsUseCase } from './application/use-cases/list-stock-outs.use-case';
 import { StockOutRepository } from './infrastructure/repositories/stock-out.repository';
 import { StockOutOrmEntity } from './infrastructure/persistence/stock-out.orm-entity';
+import { StockOutItemOrmEntity } from './infrastructure/persistence/stock-out-item.orm-entity';
 import { STOCK_OUT_REPOSITORY } from './domain/repositories/stock-out.repository.interface';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([StockOutOrmEntity])],
+  imports: [
+    TypeOrmModule.forFeature([StockOutOrmEntity, StockOutItemOrmEntity]),
+  ],
   controllers: [StockOutController],
   providers: [
     CreateStockOutUseCase,

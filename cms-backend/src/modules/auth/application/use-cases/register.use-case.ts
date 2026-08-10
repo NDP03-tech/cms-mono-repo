@@ -14,23 +14,35 @@ export class RegisterUseCase {
   ) {}
 
   async execute(dto: RegisterUser): Promise<void> {
+    console.log('=== REGISTER DEBUG ===');
+    console.log('1. dto received:', dto);
+    console.log('2. dto.username:', dto?.username);
+    console.log(
+      '3. dto.password:',
+      dto?.password ? '***exists***' : 'undefined',
+    );
+    console.log('4. typeof dto:', typeof dto);
+
     const existingUser = await this.userRepository.findByUsername(dto.username);
+    console.log('5. existingUser:', !!existingUser);
+
     if (existingUser) {
       throw new ConflictException('Tài khoản này đã tồn tại trên hệ thống!');
     }
 
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(dto.password, saltRounds);
+    console.log('6. hashedPassword generated:', !!hashedPassword);
 
-    // Bước 3: Tạo mới một Entity Domain (Đúng chuẩn nghiệp vụ DDD)
     const newUser = User.create({
       username: dto.username,
       passwordHash: hashedPassword,
-      role: Role.STAFF, // Gán quyền mặc định khi mới đăng ký
+      role: Role.STAFF,
       isActive: true,
     });
+    console.log('7. newUser created:', newUser.username);
 
-    // Bước 4: Đẩy qua Repository để lưu xuống DB (Repo sẽ tự dùng Mapper để dịch sang OrmEntity)
     await this.userRepository.save(newUser);
+    console.log('8. user saved successfully');
   }
 }

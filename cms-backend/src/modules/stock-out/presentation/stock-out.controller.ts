@@ -8,6 +8,7 @@ import {
   Param,
   Body,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateStockOutUseCase } from '../application/use-cases/create-stock-out.use-case';
 import { AddStockOutItemUseCase } from '../application/use-cases/add-stock-out-item.use-case';
@@ -18,6 +19,10 @@ import { ApproveStockOutUseCase } from '../application/use-cases/approve-stock-o
 import { RejectStockOutUseCase } from '../application/use-cases/reject-stock-out.use-case';
 import { GetStockOutUseCase } from '../application/use-cases/get-stock-out.use-case';
 import { ListStockOutsUseCase } from '../application/use-cases/list-stock-outs.use-case';
+import { JwtAuthGuard } from '../../auth/infrastructure/guards/jwt-auth.guard';
+import { RolesGuard } from '../../auth/infrastructure/guards/role.guard';
+import { Roles } from '../../../shared/decorators/role.decorator';
+import { Role } from '../../auth/domain/enums/roles.enum';
 import type {
   CreateStockOutInput,
   CreateStockOutItemInput,
@@ -26,6 +31,7 @@ import type { UpdateStockOutItemInput } from '../application/dto/update-stock-ou
 import type { StockOutFiltersInput } from '../application/dto/stock-out-filters.input';
 
 @Controller('stock-out')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class StockOutController {
   constructor(
     private readonly createStockOut: CreateStockOutUseCase,
@@ -97,11 +103,13 @@ export class StockOutController {
   }
 
   @Patch(':id/approve')
+  @Roles(Role.ADMIN)
   approve(@Param('id') id: string) {
     return this.approveStockOut.execute(id);
   }
 
   @Patch(':id/reject')
+  @Roles(Role.ADMIN)
   reject(@Param('id') id: string) {
     return this.rejectStockOut.execute(id);
   }

@@ -21,43 +21,39 @@ export class LoginUseCase {
   ) {}
 
   async execute(dto: LoginDto): Promise<TokenResponseDto> {
-    // Chuẩn hóa username
     const username = dto.username?.trim().toLowerCase();
 
-    if (!username || !dto.password) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+    console.log('=== LOGIN DEBUG ===');
+    console.log('1. username input:', username);
+    console.log('2. password input:', dto.password);
 
-    // Tìm user
     const user = await this.userRepository.findByUsername(username);
+
+    console.log('3. user found:', !!user);
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Lấy password đã hash trong Domain Entity
-    const storedHash = user.password.getValue();
+    console.log('4. user.username:', user.username);
+    console.log('5. storedHash:', user.password.getValue());
 
-    // So sánh password
+    const storedHash = user.password.getValue();
     const isMatch = await bcrypt.compare(dto.password, storedHash);
+
+    console.log('6. isMatch:', isMatch);
 
     if (!isMatch) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Payload JWT
     const payload = {
       sub: user.id,
       username: user.username,
       role: user.role,
     };
 
-    // Sinh Access Token
     const accessToken = this.jwtService.sign(payload);
-
-    // Trả về cho client
-    return {
-      accessToken,
-    };
+    return { accessToken };
   }
 }
