@@ -11,8 +11,10 @@ export class DeleteSupplierUseCase {
   ) {}
 
   async execute(id: string): Promise<void> {
-    const exists = await this.supplierRepo.existsById(id);
-    if (!exists) throw new Error(`Supplier ${id} not found`);
-    await this.supplierRepo.delete(id);
+    const supplier = await this.supplierRepo.findById(id);
+    if (!supplier) throw new Error(`Supplier ${id} not found`);
+
+    supplier.deactivate();
+    await this.supplierRepo.save(supplier);
   }
 }

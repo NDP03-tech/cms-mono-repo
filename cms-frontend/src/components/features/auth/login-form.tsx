@@ -18,10 +18,10 @@ import {
 import { Loader2 } from "lucide-react";
 
 const loginSchema = z.object({
-  email: z
+  username: z
     .string()
-    .min(1, "Email không được để trống")
-    .email("Email không hợp lệ"),
+    .min(1, "Tên đăng nhập không được để trống")
+    .min(3, "Tên đăng nhập phải có ít nhất 3 ký tự"),
   password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
 });
 
@@ -33,7 +33,7 @@ export function LoginForm() {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
@@ -52,24 +52,27 @@ export function LoginForm() {
           </div>
         )}
 
-        {/* Email */}
+        {/* Username */}
         <FormField
           control={form.control}
-          name="email"
+          name="username"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-xs font-medium text-slate-500 uppercase tracking-wide">
-                Email
+                Tên đăng nhập
               </FormLabel>
+
               <FormControl>
                 <Input
                   {...field}
-                  type="email"
-                  placeholder="admin@cms.com"
+                  type="text"
+                  placeholder="admin"
+                  autoComplete="username"
                   className="h-9 border-slate-200 text-sm focus-visible:ring-slate-900"
                   disabled={isLoading}
                 />
               </FormControl>
+
               <FormMessage className="text-xs" />
             </FormItem>
           )}
@@ -84,15 +87,18 @@ export function LoginForm() {
               <FormLabel className="text-xs font-medium text-slate-500 uppercase tracking-wide">
                 Mật khẩu
               </FormLabel>
+
               <FormControl>
                 <Input
                   {...field}
                   type="password"
                   placeholder="••••••••"
+                  autoComplete="current-password"
                   className="h-9 border-slate-200 text-sm focus-visible:ring-slate-900"
                   disabled={isLoading}
                 />
               </FormControl>
+
               <FormMessage className="text-xs" />
             </FormItem>
           )}

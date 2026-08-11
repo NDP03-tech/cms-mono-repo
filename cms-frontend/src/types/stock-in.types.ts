@@ -1,39 +1,59 @@
 // src/types/stock-in.types.ts
+
 export type StockInStatus = "draft" | "pending" | "approved" | "rejected";
 
 export interface StockInItem {
   id: string;
+  stockInId: string;
+
   productId: string;
   productName: string;
   productSku: string;
+
   quantity: number;
+
   unitPrice: number;
-  currency: string;
   totalPrice: number;
+
+  currency: string;
 }
 
 export interface StockIn {
   id: string;
   code: string;
+
   supplierId: string;
   supplierName: string;
+
   createdBy: string;
+  createdByName?: string;
+
   status: StockInStatus;
-  totalAmount: number;
+
   currency: string;
+  totalAmount: number;
+
   items: StockInItem[];
-  approvedAt?: string;
+
+  approvedAt?: string | null;
   createdAt: string;
 }
 
-export interface StockInFilters {
-  code?: string;
-  supplierId?: string;
-  status?: StockInStatus;
-  fromDate?: string;
-  toDate?: string;
-  page?: number;
-  limit?: number;
+export interface StockInItemDraft {
+  tempId: string;
+
+  productId: string;
+  productName: string;
+  productSku: string;
+
+  quantity: number;
+  unitPrice: number;
+  currency: string;
+}
+
+export interface CreateStockInInput {
+  supplierId: string;
+  currency: string;
 }
 
 export interface CreateStockInItemInput {
@@ -43,9 +63,13 @@ export interface CreateStockInItemInput {
   currency: string;
 }
 
-export interface CreateStockInInput {
-  supplierId: string;
-  createdBy: string;
+export interface UpdateStockInItemInput {
+  quantity: number;
+  unitPrice: number;
   currency: string;
-  items: CreateStockInItemInput[];
+}
+
+export interface StockInFilters {
+  status?: StockInStatus;
+  supplierId?: string;
 }

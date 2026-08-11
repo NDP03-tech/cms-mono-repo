@@ -1,7 +1,7 @@
 // src/app/(dashboard)/suppliers/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,45 +16,11 @@ import { SupplierTable } from "@/components/features/suppliers/supplier-table";
 import { SupplierSheet } from "@/components/features/suppliers/supplier-sheet";
 import { SupplierDeleteDialog } from "@/components/features/suppliers/supplier-delete-dialog";
 import { Supplier } from "@/types/supplier.types";
-
-const MOCK_SUPPLIERS: Supplier[] = [
-  {
-    id: "1",
-    name: "Công ty TNHH Dệt may Hà Nội",
-    phone: "0901234567",
-    email: "contact@detmayhanoi.vn",
-    address: "123 Nguyễn Trãi, Hà Nội",
-    isActive: true,
-  },
-  {
-    id: "2",
-    name: "Xưởng may Sài Gòn",
-    phone: "0987654321",
-    email: "info@xuongmaysaigon.vn",
-    address: "456 Lê Văn Sỹ, TP.HCM",
-    isActive: true,
-  },
-  {
-    id: "3",
-    name: "Nhà cung cấp ABC",
-    phone: "0912345678",
-    email: "abc@supplier.vn",
-    address: "789 Trần Hưng Đạo, Đà Nẵng",
-    isActive: false,
-  },
-  {
-    id: "4",
-    name: "Công ty Thời trang XYZ",
-    phone: "0923456789",
-    email: "xyz@fashion.vn",
-    address: "321 Hoàng Diệu, Hải Phòng",
-    isActive: true,
-  },
-];
+import { supplierService } from "@/services/supplier.service";
 
 export default function SuppliersPage() {
-  const [allSuppliers, setAllSuppliers] = useState<Supplier[]>(MOCK_SUPPLIERS);
-  const [suppliers, setSuppliers] = useState<Supplier[]>(MOCK_SUPPLIERS);
+  const [allSuppliers, setAllSuppliers] = useState<Supplier[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -64,6 +30,22 @@ export default function SuppliersPage() {
 
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteSupplier, setDeleteSupplier] = useState<Supplier | null>(null);
+
+  const fetchSuppliers = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const data = await supplierService.list();
+      setAllSuppliers(data ?? []);
+    } catch {
+      setAllSuppliers([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSuppliers();
+  }, [fetchSuppliers]);
 
   useEffect(() => {
     let filtered = allSuppliers;
@@ -102,30 +84,14 @@ export default function SuppliersPage() {
     setSheetOpen(true);
   }
 
-  function handleSheetSuccess(supplier?: Supplier) {
-    if (editSupplier) {
-      setAllSuppliers((prev) =>
-        prev.map((s) => (s.id === editSupplier.id ? { ...s, ...supplier } : s)),
-      );
-    } else {
-      const newSupplier: Supplier = {
-        id: Date.now().toString(),
-        name: supplier?.name ?? "",
-        phone: supplier?.phone ?? "",
-        email: supplier?.email ?? "",
-        address: supplier?.address ?? "",
-        isActive: true,
-      };
-      setAllSuppliers((prev) => [newSupplier, ...prev]);
-    }
+  async function handleSheetSuccess() {
     setSheetOpen(false);
+    await fetchSuppliers();
   }
 
-  function handleDeleteSuccess() {
-    if (deleteSupplier) {
-      setAllSuppliers((prev) => prev.filter((s) => s.id !== deleteSupplier.id));
-    }
+  async function handleDeleteSuccess() {
     setDeleteOpen(false);
+    await fetchSuppliers();
   }
 
   return (

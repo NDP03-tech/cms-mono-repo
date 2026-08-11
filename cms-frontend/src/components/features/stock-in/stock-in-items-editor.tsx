@@ -1,199 +1,121 @@
 // src/components/features/stock-in/stock-in-items-editor.tsx
+
 "use client";
 
-import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { useMemo } from "react";
+import { Plus } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ProductSearchCombobox } from "./product-search-combobox";
+
+import { StockInItemDraft } from "@/types/stock-in.types";
+
+import { StockInItemRow } from "./stock-in-item-row";
+import { StockInProductPicker } from "./stock-in-product-picker";
+
 import { Product } from "@/types/product.types";
 
-export interface StockInItemDraft {
-  tempId: string;
-  productId: string;
-  productName: string;
-  productSku: string;
-  quantity: number;
-  unitPrice: number;
-  currency: string;
-}
-
-interface StockInItemsEditorProps {
+interface Props {
   items: StockInItemDraft[];
-  onChange: (items: StockInItemDraft[]) => void;
+
   currency: string;
+
   readOnly?: boolean;
+
+  onAdd: (product: Product) => void;
+
+  onChange: (
+    itemId: string,
+    field: "quantity" | "unitPrice",
+    value: number,
+  ) => void;
+
+  onRemove: (itemId: string) => void;
 }
 
 export function StockInItemsEditor({
   items,
-  onChange,
   currency,
   readOnly = false,
-}: StockInItemsEditorProps) {
-  function handleAddProduct(product: Product) {
-    const exists = items.find((i) => i.productId === product.id);
-    if (exists) return;
+  onAdd,
+  onChange,
+  onRemove,
+}: Props) {
+  const excludeIds = useMemo(
+    () => items.map((item) => item.productId),
+    [items],
+  );
 
-    const newItem: StockInItemDraft = {
-      tempId: Date.now().toString(),
-      productId: product.id,
-      productName: product.name,
-      productSku: product.sku,
-      quantity: 1,
-      unitPrice: product.costPrice,
-      currency: product.currency,
-    };
-    onChange([...items, newItem]);
-  }
-
-  function handleQtyChange(tempId: string, qty: number) {
-    onChange(
-      items.map((i) =>
-        i.tempId === tempId ? { ...i, quantity: Math.max(1, qty) } : i,
-      ),
-    );
-  }
-
-  function handlePriceChange(tempId: string, price: number) {
-    onChange(
-      items.map((i) =>
-        i.tempId === tempId ? { ...i, unitPrice: Math.max(0, price) } : i,
-      ),
-    );
-  }
-
-  function handleRemove(tempId: string) {
-    onChange(items.filter((i) => i.tempId !== tempId));
-  }
-
-  const total = items.reduce((sum, i) => sum + i.quantity * i.unitPrice, 0);
-  const excludeIds = items.map((i) => i.productId);
+  const total = useMemo(
+    () => items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0),
+    [items],
+  );
 
   return (
-    <div className="space-y-3">
-      {/* Items table */}
-      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-slate-200 bg-slate-50">
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">
-                Sản phẩm
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide w-[100px]">
-                Số lượng
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide w-[140px]">
-                Đơn giá
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide w-[120px]">
-                Thành tiền
-              </th>
-              {!readOnly && <th className="px-4 py-3 w-[48px]" />}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {items.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={readOnly ? 4 : 5}
-                  className="px-4 py-8 text-center text-xs text-slate-400"
-                >
-                  Chưa có sản phẩm nào. Thêm sản phẩm bên dưới.
-                </td>
-              </tr>
-            ) : (
-              items.map((item) => (
-                <tr
-                  key={item.tempId}
-                  className="hover:bg-slate-50 transition-colors"
-                >
-                  <td className="px-4 py-3">
-                    <div>
-                      <p className="text-sm text-slate-700 font-medium">
-                        {item.productName}
-                      </p>
-                      <p className="text-xs font-mono text-slate-400 mt-0.5">
-                        {item.productSku}
-                      </p>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    {readOnly ? (
-                      <span className="text-sm text-slate-600">
-                        {item.quantity}
-                      </span>
-                    ) : (
-                      <Input
-                        type="number"
-                        min={1}
-                        value={item.quantity}
-                        onChange={(e) =>
-                          handleQtyChange(item.tempId, Number(e.target.value))
-                        }
-                        className="h-8 w-20 border-slate-200 text-sm focus-visible:ring-slate-900"
-                      />
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    {readOnly ? (
-                      <span className="text-sm text-slate-600">
-                        {item.unitPrice.toLocaleString("vi-VN")}
-                      </span>
-                    ) : (
-                      <Input
-                        type="number"
-                        min={0}
-                        value={item.unitPrice}
-                        onChange={(e) =>
-                          handlePriceChange(item.tempId, Number(e.target.value))
-                        }
-                        className="h-8 w-32 border-slate-200 text-sm focus-visible:ring-slate-900"
-                      />
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-slate-600">
-                    {(item.quantity * item.unitPrice).toLocaleString("vi-VN")}{" "}
-                    {currency}
-                  </td>
-                  {!readOnly && (
-                    <td className="px-4 py-3">
-                      <button
-                        onClick={() => handleRemove(item.tempId)}
-                        className="h-7 w-7 flex items-center justify-center rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </td>
-                  )}
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Add product row */}
+    <div className="space-y-4">
       {!readOnly && (
-        <ProductSearchCombobox
-          onSelect={handleAddProduct}
-          excludeIds={excludeIds}
-        />
-      )}
-
-      {/* Total */}
-      {items.length > 0 && (
-        <div className="flex justify-end">
-          <div className="bg-white rounded-lg border border-slate-200 px-6 py-3 flex items-center gap-4">
-            <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
-              Tổng tiền
-            </span>
-            <span className="text-base font-semibold text-slate-900">
-              {total.toLocaleString("vi-VN")} {currency}
-            </span>
-          </div>
+        <div>
+          <StockInProductPicker excludeIds={excludeIds} onSelect={onAdd} />
         </div>
       )}
+
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+        <div className="grid grid-cols-[1fr_100px_150px_150px_40px] gap-4 border-b border-slate-200 bg-slate-50 px-4 py-3">
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Sản phẩm
+          </span>
+
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            SL
+          </span>
+
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Đơn giá
+          </span>
+
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Thành tiền
+          </span>
+
+          {!readOnly && <span />}
+        </div>
+
+        {items.length === 0 ? (
+          <div className="flex min-h-32 flex-col items-center justify-center text-center">
+            <Plus className="mb-2 h-6 w-6 text-slate-300" />
+
+            <p className="text-sm text-slate-500">Chưa có sản phẩm</p>
+
+            {!readOnly && (
+              <p className="mt-1 text-xs text-slate-400">
+                Tìm và thêm sản phẩm ở phía trên
+              </p>
+            )}
+          </div>
+        ) : (
+          items.map((item) => (
+            <StockInItemRow
+              key={item.tempId}
+              item={item}
+              currency={currency}
+              readOnly={readOnly}
+              onChange={onChange}
+              onRemove={onRemove}
+            />
+          ))
+        )}
+
+        {items.length > 0 && (
+          <div className="flex justify-end border-t border-slate-200 bg-slate-50 px-4 py-4">
+            <div className="text-right">
+              <p className="text-xs text-slate-400">Tổng tiền</p>
+
+              <p className="mt-1 text-lg font-semibold text-slate-900">
+                {total.toLocaleString("vi-VN")} {currency}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

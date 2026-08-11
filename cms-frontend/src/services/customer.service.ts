@@ -24,7 +24,7 @@ export const customerService = {
   },
 
   async update(id: string, input: UpdateCustomerInput): Promise<void> {
-    await api.patch(`/customers/${id}`, input);
+    await api.put(`/customers/${id}`, input);
   },
 
   async delete(id: string): Promise<void> {

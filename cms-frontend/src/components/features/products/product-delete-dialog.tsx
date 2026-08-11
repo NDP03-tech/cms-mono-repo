@@ -14,7 +14,7 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { Product } from "@/types/product.types";
-
+import { productService } from "@/services/product.service";
 interface ProductDeleteDialogProps {
   open: boolean;
   onClose: () => void;
@@ -35,10 +35,10 @@ export function ProductDeleteDialog({
     setIsLoading(true);
     try {
       // Khi kết nối BE thật uncomment:
-      // await productService.delete(product.id);
+      await productService.delete(product.id);
 
       // Mock — giả lập delay
-      await new Promise((resolve) => setTimeout(resolve, 400));
+
       onSuccess();
       onClose();
     } finally {

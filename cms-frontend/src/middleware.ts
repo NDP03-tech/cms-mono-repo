@@ -1,25 +1,29 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const DISABLE_AUTH = true;
-
 const PUBLIC_ROUTES = ["/login"];
 
 export function middleware(request: NextRequest) {
-  if (DISABLE_AUTH) {
-    return NextResponse.next();
-  }
-
-  const token = request.cookies.get("access_token")?.value;
   const { pathname } = request.nextUrl;
 
-  const isPublic = PUBLIC_ROUTES.includes(pathname);
+  // Cho phép các route public
+  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
 
-  if (!token && !isPublic) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  // Lấy access token từ cookie
+  const token = request.cookies.get("access_token")?.value;
+
+  // Chưa đăng nhập và truy cập route protected
+  if (!token && !isPublicRoute) {
+    const loginUrl = new URL("/login", request.url);
+
+    // Lưu lại URL hiện tại để redirect về sau khi login
+    loginUrl.searchParams.set("redirect", pathname);
+
+    return NextResponse.redirect(loginUrl);
   }
 
-  if (token && isPublic) {
+  // Đã đăng nhập nhưng truy cập /login
+  if (token && isPublicRoute) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 

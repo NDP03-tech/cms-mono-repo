@@ -8,6 +8,7 @@ import {
   Body,
   Query,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { CreateStockInUseCase } from '../application/use-cases/create-stock-in';
 import { AddStockInItemUseCase } from '../application/use-cases/add-stock-in-item';
@@ -49,7 +50,13 @@ export class StockInController {
   // ----------------------------------------------------------------
 
   @Post()
-  create(@Body() input: CreateStockInInput) {
+  create(@Body() input: CreateStockInInput, @Req() req: any) {
+    // Use authenticated user from JWT as the creator, ignore client-provided createdBy
+    const user = req.user as any;
+    if (user && user.id) {
+      input.createdBy = user.id;
+    }
+
     return this.createStockIn.execute(input);
   }
 

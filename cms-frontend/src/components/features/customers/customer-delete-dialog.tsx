@@ -14,6 +14,7 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { Customer } from "@/types/customer.types";
+import { customerService } from "@/services/customer.service";
 
 interface CustomerDeleteDialogProps {
   open: boolean;
@@ -35,9 +36,7 @@ export function CustomerDeleteDialog({
     setIsLoading(true);
     try {
       // Khi kết nối BE thật uncomment:
-      // await customerService.delete(customer.id);
-
-      await new Promise((resolve) => setTimeout(resolve, 400));
+      await customerService.delete(customer.id);
       onSuccess();
       onClose();
     } finally {

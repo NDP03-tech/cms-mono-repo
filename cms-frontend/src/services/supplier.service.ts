@@ -24,7 +24,7 @@ export const supplierService = {
   },
 
   async update(id: string, input: UpdateSupplierInput): Promise<void> {
-    await api.patch(`/suppliers/${id}`, input);
+    await api.put(`/suppliers/${id}`, input);
   },
 
   async delete(id: string): Promise<void> {

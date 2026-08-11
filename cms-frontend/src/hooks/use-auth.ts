@@ -1,26 +1,36 @@
 // src/hooks/use-auth.ts
+
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { authService } from "@/services/auth.service";
 import { LoginInput } from "@/types/auth.types";
 
 export function useAuth() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function login(input: LoginInput) {
     setIsLoading(true);
     setError(null);
+
     try {
-      const response = await authService.login(input);
-      authService.setToken(response.accessToken);
-      router.push("/");
+      await authService.login(input);
+
+      const redirect = searchParams.get("redirect") || "/";
+
+      router.replace(redirect);
+      router.refresh();
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Email hoặc mật khẩu không đúng";
+        err instanceof Error
+          ? err.message
+          : "Username hoặc mật khẩu không đúng";
+
       setError(message);
     } finally {
       setIsLoading(false);
@@ -28,9 +38,20 @@ export function useAuth() {
   }
 
   async function logout() {
-    await authService.logout();
-    router.push("/login");
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      router.replace("/login");
+      router.refresh();
+    }
   }
 
-  return { login, logout, isLoading, error };
+  return {
+    login,
+    logout,
+    isLoading,
+    error,
+  };
 }

@@ -24,7 +24,7 @@ export const productService = {
   },
 
   async update(id: string, input: UpdateProductInput): Promise<void> {
-    await api.patch(`/products/${id}`, input);
+    await api.put(`/products/${id}`, input);
   },
 
   async delete(id: string): Promise<void> {

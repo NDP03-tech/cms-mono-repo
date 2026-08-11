@@ -1,8 +1,8 @@
 // src/app/(dashboard)/stock-out/[id]/page.tsx
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import {
   ArrowLeft,
   CheckCircle,
@@ -29,63 +29,63 @@ import {
   StockOutItemDraft,
 } from "@/components/features/stock-out/stock-out-items-editor";
 import { StockOut } from "@/types/stock-out.types";
-
-const MOCK_DETAIL: StockOut = {
-  id: "3",
-  code: "PX-20240117-001",
-  customerId: "4",
-  customerName: "Phạm Thị Dung",
-  createdBy: "admin",
-  status: "draft",
-  totalAmount: 5250000,
-  currency: "VND",
-  items: [
-    {
-      id: "i3",
-      productId: "3",
-      productName: "Giày thể thao Nike",
-      productSku: "SP-003",
-      quantity: 5,
-      unitPrice: 950000,
-      currency: "VND",
-      totalPrice: 4750000,
-    },
-    {
-      id: "i4",
-      productId: "5",
-      productName: "Mũ lưỡi trai",
-      productSku: "SP-006",
-      quantity: 5,
-      unitPrice: 100000,
-      currency: "VND",
-      totalPrice: 500000,
-    },
-  ],
-  createdAt: "2024-01-17T08:00:00Z",
-};
+import { stockOutService } from "@/services/stock-out.service";
 
 export default function StockOutDetailPage() {
-  const router = useRouter();
-  const [stockOut, setStockOut] = useState<StockOut>(MOCK_DETAIL);
+  const params = useParams();
+  const [stockOut, setStockOut] = useState<StockOut | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [confirmAction, setConfirmAction] = useState<
     "submit" | "approve" | "reject" | null
   >(null);
+  const [draftItems, setDraftItems] = useState<StockOutItemDraft[]>([]);
+
+  useEffect(() => {
+    async function load() {
+      if (!params?.id) return;
+      setIsLoading(true);
+      try {
+        const data = await stockOutService.getById(params.id);
+        setStockOut(data);
+      } catch {
+        setStockOut(null);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    load();
+  }, [params]);
+
+  useEffect(() => {
+    if (!stockOut) {
+      setDraftItems([]);
+      return;
+    }
+
+    setDraftItems(
+      stockOut.items.map((i) => ({
+        tempId: i.id,
+        productId: i.productId,
+        productName: i.productName,
+        productSku: i.productSku,
+        quantity: i.quantity,
+        unitPrice: i.unitPrice,
+        currency: i.currency,
+      })),
+    );
+  }, [stockOut]);
+
+  if (!stockOut) {
+    return (
+      <div className="text-slate-500">
+        Đang tải hoặc không tìm thấy phiếu xuất.
+      </div>
+    );
+  }
 
   const isDraft = stockOut.status === "draft";
   const isPending = stockOut.status === "pending";
-
-  const [draftItems, setDraftItems] = useState<StockOutItemDraft[]>(
-    stockOut.items.map((i) => ({
-      tempId: i.id,
-      productId: i.productId,
-      productName: i.productName,
-      productSku: i.productSku,
-      quantity: i.quantity,
-      unitPrice: i.unitPrice,
-      currency: i.currency,
-    })),
-  );
 
   async function handleAction(action: "submit" | "approve" | "reject") {
     setIsLoading(true);
@@ -102,7 +102,7 @@ export default function StockOutDetailPage() {
           : action === "approve"
             ? "approved"
             : "rejected";
-      setStockOut((prev) => ({ ...prev, status: nextStatus }));
+      setStockOut((prev) => (prev ? { ...prev, status: nextStatus } : prev));
       setConfirmAction(null);
     } finally {
       setIsLoading(false);
