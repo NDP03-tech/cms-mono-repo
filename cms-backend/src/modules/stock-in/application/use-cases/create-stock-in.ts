@@ -19,7 +19,7 @@ export class CreateStockInUseCase {
       currency: input.currency,
     });
 
-    for (const item of input.items) {
+    for (const item of input.items ?? []) {
       stockIn.addItem({
         productId: item.productId,
         quantity: item.quantity,

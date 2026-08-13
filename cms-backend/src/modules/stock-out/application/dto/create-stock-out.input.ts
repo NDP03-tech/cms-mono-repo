@@ -11,4 +11,8 @@ export interface CreateStockOutInput {
   createdBy: string;
   currency: string;
   items: CreateStockOutItemInput[];
+  // Người trực tiếp nhận hàng — có thể khác thông tin khách hàng gốc
+  recipientName?: string;
+  recipientPhone?: string;
+  note?: string;
 }

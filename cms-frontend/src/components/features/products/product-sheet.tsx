@@ -38,7 +38,13 @@ const schema = z.object({
     .max(10, "Đơn vị tiền tệ không quá 10 ký tự"),
 });
 
-type FormValues = z.infer<typeof schema>;
+// FormInput: kiểu dữ liệu TRƯỚC khi zod coerce (costPrice có thể là string/unknown
+// vì input HTML luôn trả string, dù type="number").
+// FormValues (output): kiểu dữ liệu SAU khi zod coerce — costPrice chắc chắn là number.
+// Tách 2 type này để khớp đúng generic của react-hook-form + zodResolver,
+// tránh lỗi "Type 'unknown' is not assignable to type 'number'".
+type FormInput = z.input<typeof schema>;
+type FormValues = z.output<typeof schema>;
 
 interface ProductSheetProps {
   open: boolean;
@@ -47,7 +53,7 @@ interface ProductSheetProps {
   product?: Product | null;
 }
 
-const EMPTY_FORM: FormValues = {
+const EMPTY_FORM: FormInput = {
   sku: "",
   name: "",
   unit: "",
@@ -72,7 +78,7 @@ export function ProductSheet({
     setValue,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormValues>({
+  } = useForm<FormInput, unknown, FormValues>({
     resolver: zodResolver(schema),
     defaultValues: EMPTY_FORM,
   });
@@ -100,6 +106,9 @@ export function ProductSheet({
       reset(EMPTY_FORM);
     }
 
+    // Đồng bộ error state cùng lúc reset form khi sheet mở lại / đổi product —
+    // đây là pattern hợp lệ theo React docs (resetting state on prop change).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setError(null);
   }, [open, product, reset]);
 

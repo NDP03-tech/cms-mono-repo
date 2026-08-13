@@ -26,7 +26,10 @@ export class StockInMapper {
       id: orm.id,
       stockInId: orm.stockInId,
       productId: orm.productId,
-      quantity: orm.quantity,
+      quantity:
+        typeof orm.quantity === 'string'
+          ? parseFloat(orm.quantity as unknown as string)
+          : orm.quantity,
       unitPrice: Money.create(orm.unitPrice, orm.currency),
       totalPrice: Money.create(orm.totalPrice, orm.currency),
     });

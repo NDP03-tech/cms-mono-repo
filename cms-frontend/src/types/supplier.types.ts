@@ -6,6 +6,7 @@ export interface Supplier {
   address?: string;
   email?: string;
   isActive: boolean;
+  code?: string;
 }
 
 export interface SupplierFilters {
@@ -13,6 +14,7 @@ export interface SupplierFilters {
   isActive?: boolean;
   page?: number;
   limit?: number;
+  code?: string;
 }
 
 export interface CreateSupplierInput {
@@ -20,6 +22,7 @@ export interface CreateSupplierInput {
   phone?: string;
   address?: string;
   email?: string;
+  code?: string;
 }
 
 export interface UpdateSupplierInput {
@@ -27,5 +30,6 @@ export interface UpdateSupplierInput {
   phone?: string;
   address?: string;
   email?: string;
+  code?: string;
   isActive?: boolean;
 }

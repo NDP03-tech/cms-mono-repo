@@ -52,7 +52,9 @@ export class StockInItem {
       props.id,
       props.stockInId,
       props.productId,
-      props.quantity,
+      typeof props.quantity === 'string'
+        ? parseFloat(props.quantity)
+        : props.quantity,
       props.unitPrice,
       props.totalPrice,
     );

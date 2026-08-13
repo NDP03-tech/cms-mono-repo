@@ -18,6 +18,9 @@ export class StockOutMapper {
       items: (orm.items ?? []).map(StockOutMapper.toItemDomain),
       approvedAt: orm.approvedAt ?? undefined,
       createdAt: orm.createdAt,
+      recipientName: orm.recipientName ?? undefined,
+      recipientPhone: orm.recipientPhone ?? undefined,
+      note: orm.note ?? undefined,
     });
   }
 
@@ -42,6 +45,9 @@ export class StockOutMapper {
     orm.currency = stockOut.totalAmount.currencyValue;
     orm.approvedAt = stockOut.approvedAt ?? null;
     orm.createdAt = stockOut.createdAt;
+    orm.recipientName = stockOut.recipientName ?? null;
+    orm.recipientPhone = stockOut.recipientPhone ?? null;
+    orm.note = stockOut.note ?? null;
     orm.items = stockOut.items.map(StockOutMapper.toItemPersistence);
     return orm;
   }

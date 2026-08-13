@@ -15,6 +15,9 @@ export class CreateStockOutUseCase {
       customerId: input.customerId,
       createdBy: input.createdBy,
       currency: input.currency,
+      recipientName: input.recipientName,
+      recipientPhone: input.recipientPhone,
+      note: input.note,
     });
     for (const item of input.items) {
       stockOut.addItem({

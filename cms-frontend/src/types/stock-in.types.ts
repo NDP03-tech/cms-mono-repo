@@ -18,24 +18,19 @@ export interface StockInItem {
   currency: string;
 }
 
+// src/types/stock-in.types.ts — thêm field còn thiếu
 export interface StockIn {
   id: string;
   code: string;
-
   supplierId: string;
   supplierName: string;
-
   createdBy: string;
-  createdByName?: string;
-
+  createdByName?: string; // thêm — optional vì BE có thể không trả
   status: StockInStatus;
-
-  currency: string;
   totalAmount: number;
-
+  currency: string;
   items: StockInItem[];
-
-  approvedAt?: string | null;
+  approvedAt?: string;
   createdAt: string;
 }
 
@@ -54,6 +49,12 @@ export interface StockInItemDraft {
 export interface CreateStockInInput {
   supplierId: string;
   currency: string;
+  items?: {
+    productId: string;
+    quantity: number;
+    unitPrice: number;
+    currency: string;
+  }[];
 }
 
 export interface CreateStockInItemInput {

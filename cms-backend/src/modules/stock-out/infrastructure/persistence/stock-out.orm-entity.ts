@@ -41,8 +41,22 @@ export class StockOutOrmEntity {
   @CreateDateColumn()
   createdAt: Date;
 
+  // Thông tin người nhận hàng — nhập khi tạo phiếu, hiển thị ở chi tiết phiếu
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  recipientName: string | null;
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  recipientPhone: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  note: string | null;
+
+  // orphanedRowAction: 'delete' — BẮT BUỘC để TypeORM tự xoá row item
+  // đã bị loại khỏi mảng `items` khi save() (vd: sau khi removeItem()).
+  // Thiếu option này thì item bị xoá ở domain vẫn còn sót trong DB.
   @OneToMany(() => StockOutItemOrmEntity, (item) => item.stockOut, {
     cascade: true,
+    orphanedRowAction: 'delete',
   })
   items: StockOutItemOrmEntity[];
 }

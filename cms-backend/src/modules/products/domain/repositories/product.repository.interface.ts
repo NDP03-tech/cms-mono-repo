@@ -13,15 +13,15 @@ export interface ProductFilters {
   limit?: number;
 }
 
+// domain/repositories/product.repository.interface.ts
 export interface IProductRepository {
   findById(id: string): Promise<Product | null>;
+  findByIds(ids: string[]): Promise<Product[]>; // ← thêm mới
   findBySku(sku: SKU): Promise<Product | null>;
   findByName(name: string): Promise<Product[]>;
   findAll(filters?: ProductFilters): Promise<Product[]>;
-
   existsById(id: string): Promise<boolean>;
   existsBySku(sku: SKU): Promise<boolean>;
-
   save(product: Product): Promise<void>;
   delete(id: string): Promise<void>;
 }

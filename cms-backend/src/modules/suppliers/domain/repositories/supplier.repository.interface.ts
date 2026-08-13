@@ -16,5 +16,6 @@ export interface ISupplierRepository {
   findAll(filters?: SupplierFilters): Promise<Supplier[]>;
   existsById(id: string): Promise<boolean>;
   save(supplier: Supplier): Promise<void>;
+  findByIds(ids: string[]): Promise<Supplier[]>;
   delete(id: string): Promise<void>;
 }

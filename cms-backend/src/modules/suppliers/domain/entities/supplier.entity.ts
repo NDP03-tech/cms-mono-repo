@@ -5,6 +5,7 @@ import { Address } from '../value-objects/address.vo';
 
 export interface CreateSupplierProps {
   name: string;
+  code?: string;
   phone?: string;
   address?: string;
   email?: string;
@@ -14,6 +15,7 @@ export interface CreateSupplierProps {
 export interface SupplierProps {
   id: string;
   name: string;
+  code?: string;
   phone?: Phone;
   address?: Address;
   email?: string;
@@ -24,6 +26,7 @@ export class Supplier {
   private constructor(
     private readonly _id: string,
     private _name: string,
+    private _code: string | undefined,
     private _phone: Phone | undefined,
     private _address: Address | undefined,
     private _email: string | undefined,
@@ -38,6 +41,7 @@ export class Supplier {
     return new Supplier(
       randomUUID(),
       props.name.trim(),
+      props.code?.trim() ?? undefined,
       props.phone ? Phone.create(props.phone) : undefined,
       props.address ? Address.create(props.address) : undefined,
       props.email?.trim() ?? undefined,
@@ -49,6 +53,7 @@ export class Supplier {
     return new Supplier(
       props.id,
       props.name,
+      props.code,
       props.phone,
       props.address,
       props.email,
@@ -64,6 +69,10 @@ export class Supplier {
     const trimmed = name?.trim();
     if (!trimmed) throw new Error('Supplier name cannot be empty');
     this._name = trimmed;
+  }
+
+  updateCode(code: string | undefined): void {
+    this._code = code?.trim() ?? undefined;
   }
 
   updatePhone(phone: string | undefined): void {
@@ -96,6 +105,9 @@ export class Supplier {
   }
   get name(): string {
     return this._name;
+  }
+  get code(): string | undefined {
+    return this._code;
   }
   get phone(): Phone | undefined {
     return this._phone;

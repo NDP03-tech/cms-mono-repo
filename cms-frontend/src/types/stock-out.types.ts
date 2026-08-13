@@ -1,22 +1,21 @@
 // src/types/stock-out.types.ts
+
+// Đã xác nhận: StockOutEnum ở BE là chữ thường.
 export type StockOutStatus = "draft" | "pending" | "approved" | "rejected";
 
 export interface StockOutItem {
   id: string;
   productId: string;
-  productName: string;
-  productSku: string;
   quantity: number;
   unitPrice: number;
-  currency: string;
   totalPrice: number;
+  currency: string;
 }
 
 export interface StockOut {
   id: string;
   code: string;
   customerId: string;
-  customerName: string;
   createdBy: string;
   status: StockOutStatus;
   totalAmount: number;
@@ -24,16 +23,12 @@ export interface StockOut {
   items: StockOutItem[];
   approvedAt?: string;
   createdAt: string;
-}
 
-export interface StockOutFilters {
-  code?: string;
-  customerId?: string;
-  status?: StockOutStatus;
-  fromDate?: string;
-  toDate?: string;
-  page?: number;
-  limit?: number;
+  // KHÔNG có trong StockOutOutput trả về từ BE — đây là field FE tự gắn thêm
+  // sau khi fetch (xem lib/enrich-stock-out.ts). Luôn optional, đừng đọc trực
+  // tiếp field này ngay sau stockOutService.list()/getById() mà chưa enrich.
+  customerName?: string;
+  createdByName?: string;
 }
 
 export interface CreateStockOutItemInput {
@@ -45,7 +40,37 @@ export interface CreateStockOutItemInput {
 
 export interface CreateStockOutInput {
   customerId: string;
-  createdBy: string;
+  // BE ghi đè bằng user JWT (StockOutController#create) nên FE không bắt buộc gửi.
+  createdBy?: string;
   currency: string;
   items: CreateStockOutItemInput[];
+}
+
+export interface UpdateStockOutItemInput {
+  itemId: string;
+  quantity: number;
+  unitPrice: number;
+  currency: string;
+}
+
+export interface StockOutFilters {
+  code?: string;
+  customerId?: string;
+  createdBy?: string;
+  status?: StockOutStatus;
+  fromDate?: string;
+  toDate?: string;
+  page?: number;
+  limit?: number;
+}
+
+/** Item nháp khi đang dựng phiếu ở trang /stock-out/new — chưa persist lên BE. */
+export interface StockOutItemDraft {
+  tempId: string;
+  productId: string;
+  productName: string;
+  productSku?: string;
+  quantity: number;
+  unitPrice: number;
+  currency: string;
 }

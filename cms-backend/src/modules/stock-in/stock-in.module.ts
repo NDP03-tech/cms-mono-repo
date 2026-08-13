@@ -14,9 +14,16 @@ import { StockInRepository } from './infrastructure/repositories/stock-in.reposi
 import { StockInOrmEntity } from './infrastructure/persistence/stock-in.orm-entity';
 import { StockInItemOrmEntity } from './infrastructure/persistence/stock-in-item.orm-entity';
 import { STOCK_IN_REPOSITORY } from './domain/repositories/stock-in.repository.interface';
-
+import { AuthModule } from '../auth/infrastructure/auth.module';
+import { SuppliersModule } from '../suppliers/infrastructure/suppliers.module';
+import { ProductsModule } from '../products/infrastructure/products.module';
 @Module({
-  imports: [TypeOrmModule.forFeature([StockInOrmEntity, StockInItemOrmEntity])],
+  imports: [
+    TypeOrmModule.forFeature([StockInOrmEntity, StockInItemOrmEntity]),
+    SuppliersModule, // ← thêm dòng này
+    ProductsModule, // ← thêm dòng này
+    AuthModule,
+  ],
   controllers: [StockInController],
   providers: [
     CreateStockInUseCase,

@@ -1,4 +1,4 @@
-// src/components/features/stock-in/stock-in-submit-dialog.tsx
+// src/components/features/stock-out/stock-out-approve-dialog.tsx
 
 "use client";
 
@@ -16,37 +16,36 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { StockIn } from "@/types/stock-in.types";
+import { StockOut } from "@/types/stock-out.types";
 
-import { stockInService } from "@/services/stock-in.service";
+import { stockOutService } from "@/services/stock-out.service";
 
 interface Props {
-  stockIn: StockIn | null;
+  stockOut: StockOut | null;
   open: boolean;
 
   onOpenChange: (open: boolean) => void;
-  onSuccess: (stockIn: StockIn) => void;
+  onSuccess: (stockOut: StockOut) => void;
 }
 
-export function StockInSubmitDialog({
-  stockIn,
+export function StockOutApproveDialog({
+  stockOut,
   open,
   onOpenChange,
   onSuccess,
 }: Props) {
   const [loading, setLoading] = useState(false);
 
-  // stock-in-submit-dialog.tsx — fix undefined
-  async function handleSubmit() {
-    if (!stockIn) return;
+  async function handleApprove() {
+    if (!stockOut) return;
     setLoading(true);
     try {
-      await stockInService.submit(stockIn.id);
-      const fresh = await stockInService.getById(stockIn.id);
+      await stockOutService.approve(stockOut.id);
+      const fresh = await stockOutService.getById(stockOut.id);
       onSuccess(fresh);
       onOpenChange(false);
     } catch (error) {
-      console.error("Submit failed:", error);
+      console.error("Approve failed:", error);
     } finally {
       setLoading(false);
     }
@@ -56,11 +55,11 @@ export function StockInSubmitDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Gửi phiếu duyệt?</AlertDialogTitle>
+          <AlertDialogTitle>Duyệt phiếu xuất?</AlertDialogTitle>
 
           <AlertDialogDescription>
-            Sau khi gửi, phiếu sẽ chuyển sang trạng thái &quot;Chờ duyệt&quot;
-            và không thể chỉnh sửa sản phẩm.
+            Sau khi duyệt, phiếu xuất sẽ được xác nhận. Tồn kho có thể được cập
+            nhật theo nghiệp vụ của hệ thống.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -69,11 +68,11 @@ export function StockInSubmitDialog({
 
           <AlertDialogAction
             disabled={loading}
-            onClick={handleSubmit}
-            className="bg-slate-900 hover:bg-slate-800"
+            onClick={handleApprove}
+            className="bg-emerald-600 hover:bg-emerald-700"
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Gửi duyệt
+            Duyệt phiếu
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

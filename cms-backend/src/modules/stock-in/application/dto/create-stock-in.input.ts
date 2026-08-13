@@ -10,5 +10,5 @@ export interface CreateStockInInput {
   supplierId: string;
   createdBy: string;
   currency: string;
-  items: CreateStockInItemInput[];
+  items?: CreateStockInItemInput[]; // ← đảm bảo có "?"
 }

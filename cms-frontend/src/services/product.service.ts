@@ -8,9 +8,11 @@ import {
 } from "@/types/product.types";
 
 export const productService = {
-  async list(filters?: ProductFilters): Promise<Product[]> {
-    const { data } = await api.get("/products", { params: filters });
-    return data;
+  async list(search?: string): Promise<Product[]> {
+    const { data } = await api.get<Product[]>("/products", {
+      params: search ? { search } : undefined,
+    });
+    return data ?? [];
   },
 
   async getById(id: string): Promise<Product> {

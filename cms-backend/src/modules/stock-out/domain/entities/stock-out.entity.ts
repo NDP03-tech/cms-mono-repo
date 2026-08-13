@@ -9,6 +9,11 @@ export interface CreateStockOutProps {
   customerId: string;
   createdBy: string;
   currency: string;
+  // Thông tin người nhận hàng thực tế — có thể khác với khách hàng
+  // đã đăng ký trong hệ thống (vd: nhân viên khách hàng đến nhận).
+  recipientName?: string;
+  recipientPhone?: string;
+  note?: string;
 }
 
 export interface StockOutProps {
@@ -21,6 +26,9 @@ export interface StockOutProps {
   items: StockOutItem[];
   approvedAt?: Date;
   createdAt: Date;
+  recipientName?: string;
+  recipientPhone?: string;
+  note?: string;
 }
 
 export class StockOut {
@@ -34,6 +42,9 @@ export class StockOut {
     private _items: StockOutItem[],
     private _approvedAt: Date | undefined,
     private readonly _createdAt: Date,
+    private readonly _recipientName: string | undefined,
+    private readonly _recipientPhone: string | undefined,
+    private readonly _note: string | undefined,
   ) {}
 
   // ----------------------------------------------------------------
@@ -51,6 +62,9 @@ export class StockOut {
       [],
       undefined,
       new Date(),
+      props.recipientName,
+      props.recipientPhone,
+      props.note,
     );
   }
 
@@ -65,6 +79,9 @@ export class StockOut {
       props.items,
       props.approvedAt,
       props.createdAt,
+      props.recipientName,
+      props.recipientPhone,
+      props.note,
     );
   }
 
@@ -195,5 +212,14 @@ export class StockOut {
   }
   get createdAt(): Date {
     return this._createdAt;
+  }
+  get recipientName(): string | undefined {
+    return this._recipientName;
+  }
+  get recipientPhone(): string | undefined {
+    return this._recipientPhone;
+  }
+  get note(): string | undefined {
+    return this._note;
   }
 }

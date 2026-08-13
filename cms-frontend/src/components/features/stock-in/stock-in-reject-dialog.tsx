@@ -36,18 +36,17 @@ export function StockInRejectDialog({
 }: Props) {
   const [loading, setLoading] = useState(false);
 
+  // stock-in-reject-dialog.tsx — fix undefined
   async function handleReject() {
     if (!stockIn) return;
-
     setLoading(true);
-
     try {
-      const updated = await stockInService.reject(stockIn.id);
-
-      onSuccess(updated);
+      await stockInService.reject(stockIn.id);
+      const fresh = await stockInService.getById(stockIn.id);
+      onSuccess(fresh);
       onOpenChange(false);
     } catch (error) {
-      console.error(error);
+      console.error("Reject failed:", error);
     } finally {
       setLoading(false);
     }
@@ -60,8 +59,8 @@ export function StockInRejectDialog({
           <AlertDialogTitle>Từ chối phiếu nhập?</AlertDialogTitle>
 
           <AlertDialogDescription>
-            Phiếu nhập sẽ chuyển sang trạng thái "Từ chối" và không thể tiếp tục
-            xử lý.
+            Phiếu nhập sẽ chuyển sang trạng thái &quot;Từ chối&quot; và không
+            thể tiếp tục xử lý.
           </AlertDialogDescription>
         </AlertDialogHeader>
 

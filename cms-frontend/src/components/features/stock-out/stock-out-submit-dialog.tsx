@@ -1,4 +1,4 @@
-// src/components/features/stock-in/stock-in-submit-dialog.tsx
+// src/components/features/stock-out/stock-out-submit-dialog.tsx
 
 "use client";
 
@@ -16,33 +16,32 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { StockIn } from "@/types/stock-in.types";
+import { StockOut } from "@/types/stock-out.types";
 
-import { stockInService } from "@/services/stock-in.service";
+import { stockOutService } from "@/services/stock-out.service";
 
 interface Props {
-  stockIn: StockIn | null;
+  stockOut: StockOut | null;
   open: boolean;
 
   onOpenChange: (open: boolean) => void;
-  onSuccess: (stockIn: StockIn) => void;
+  onSuccess: (stockOut: StockOut) => void;
 }
 
-export function StockInSubmitDialog({
-  stockIn,
+export function StockOutSubmitDialog({
+  stockOut,
   open,
   onOpenChange,
   onSuccess,
 }: Props) {
   const [loading, setLoading] = useState(false);
 
-  // stock-in-submit-dialog.tsx — fix undefined
   async function handleSubmit() {
-    if (!stockIn) return;
+    if (!stockOut) return;
     setLoading(true);
     try {
-      await stockInService.submit(stockIn.id);
-      const fresh = await stockInService.getById(stockIn.id);
+      await stockOutService.submit(stockOut.id);
+      const fresh = await stockOutService.getById(stockOut.id);
       onSuccess(fresh);
       onOpenChange(false);
     } catch (error) {

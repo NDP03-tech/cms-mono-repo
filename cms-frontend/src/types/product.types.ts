@@ -1,12 +1,10 @@
 // src/types/product.types.ts
 export interface Product {
   id: string;
-  sku: string;
   name: string;
-  unit: string;
+  sku: string;
   costPrice: number;
   currency: string;
-  isActive: boolean;
 }
 
 export interface ProductFilters {

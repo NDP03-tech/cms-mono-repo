@@ -75,30 +75,36 @@ export class StockInController {
   // ----------------------------------------------------------------
 
   @Post(':id/items')
-  addItem(
+  async addItem(
     @Param('id') stockInId: string,
     @Body() input: CreateStockInItemInput,
   ) {
-    return this.addStockInItem.execute(stockInId, input);
+    await this.addStockInItem.execute(stockInId, input);
+    return this.getStockIn.execute(stockInId);
   }
 
   @Patch(':id/items/:itemId')
-  updateItem(
+  async updateItem(
     @Param('id') stockInId: string,
     @Param('itemId') itemId: string,
     @Body() input: UpdateStockInItemInput,
   ) {
-    return this.updateStockInItem.execute(stockInId, {
+    await this.updateStockInItem.execute(stockInId, {
       itemId,
       quantity: input.quantity,
       unitPrice: input.unitPrice,
       currency: input.currency,
     });
+    return this.getStockIn.execute(stockInId);
   }
 
   @Delete(':id/items/:itemId')
-  removeItem(@Param('id') stockInId: string, @Param('itemId') itemId: string) {
-    return this.removeStockInItem.execute(stockInId, itemId);
+  async removeItem(
+    @Param('id') stockInId: string,
+    @Param('itemId') itemId: string,
+  ) {
+    await this.removeStockInItem.execute(stockInId, itemId);
+    return this.getStockIn.execute(stockInId);
   }
 
   // ----------------------------------------------------------------

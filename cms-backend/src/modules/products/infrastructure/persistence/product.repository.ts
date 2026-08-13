@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { Repository, Like, In } from 'typeorm';
 import {
   IProductRepository,
   PRODUCT_REPOSITORY,
@@ -64,6 +64,22 @@ export class ProductRepository implements IProductRepository {
 
     const rows = await qb.getMany();
     return rows.map((r) => ProductMapper.toDomain(r));
+  }
+  async findByIds(ids: string[]): Promise<Product[]> {
+    const validIds = ids
+      .map((id) => id.trim())
+      .filter(
+        (id) =>
+          id.length > 0 &&
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+            id,
+          ),
+      );
+
+    if (validIds.length === 0) return [];
+
+    const found = await this.repo.find({ where: { id: In(validIds) } });
+    return found.map((f) => ProductMapper.toDomain(f));
   }
 
   async existsById(id: string): Promise<boolean> {

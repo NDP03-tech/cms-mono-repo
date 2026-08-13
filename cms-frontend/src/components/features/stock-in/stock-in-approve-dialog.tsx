@@ -36,18 +36,18 @@ export function StockInApproveDialog({
 }: Props) {
   const [loading, setLoading] = useState(false);
 
+  // stock-in-approve-dialog.tsx — fix undefined
   async function handleApprove() {
     if (!stockIn) return;
-
     setLoading(true);
-
     try {
-      const updated = await stockInService.approve(stockIn.id);
-
-      onSuccess(updated);
+      await stockInService.approve(stockIn.id);
+      // Reload fresh data thay vì dùng response có thể undefined
+      const fresh = await stockInService.getById(stockIn.id);
+      onSuccess(fresh);
       onOpenChange(false);
     } catch (error) {
-      console.error(error);
+      console.error("Approve failed:", error);
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,11 @@
 // infrastructure/persistence/stock-out-item.orm-entity.ts
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { StockOutOrmEntity } from './stock-out.orm-entity';
 
 @Entity('stock_out_items')
@@ -25,6 +31,10 @@ export class StockOutItemOrmEntity {
   @Column({ length: 10 })
   currency: string;
 
+  // @JoinColumn khai báo tường minh: quan hệ này dùng ĐÚNG cột
+  // stockOutId ở trên, tránh TypeORM tự đoán và có thể tạo/khớp
+  // sai cột join khi không có annotation này.
   @ManyToOne(() => StockOutOrmEntity, (stockOut) => stockOut.items)
+  @JoinColumn({ name: 'stockOutId' })
   stockOut: StockOutOrmEntity;
 }

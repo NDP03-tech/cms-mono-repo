@@ -16,8 +16,29 @@ export const stockInService = {
   // ============================================================
 
   async list(filters?: StockInFilters): Promise<StockIn[]> {
+    /**
+     * Không gửi các query param có giá trị:
+     * undefined / null / ""
+     *
+     * Ví dụ:
+     * {
+     *   supplierId: "",
+     *   status: "",
+     * }
+     *
+     * sẽ trở thành:
+     * {}
+     */
+    const params = Object.fromEntries(
+      Object.entries(filters ?? {}).filter(
+        ([, value]) => value !== undefined && value !== null && value !== "",
+      ),
+    );
+
+    console.log("GET /stock-in params:", params);
+
     const { data } = await api.get<StockIn[]>("/stock-in", {
-      params: filters,
+      params,
     });
 
     return data ?? [];

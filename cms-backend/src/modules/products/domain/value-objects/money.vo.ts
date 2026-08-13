@@ -3,10 +3,18 @@ export class Money {
     private readonly currency: string,
     private readonly amount: number,
   ) {}
-  static create(amount: number, currency: string): Money {
+  static create(amount: number | string, currency: string): Money {
     const finalCurrency = currency.toUpperCase().trim();
-    if (amount < 0) throw new Error('Khong the de so tien la gia tri am o day');
-    return new Money(finalCurrency, amount);
+    const finalAmount =
+      typeof amount === 'string' ? parseFloat(amount) : amount;
+
+    if (Number.isNaN(finalAmount)) {
+      throw new Error('So tien khong hop le');
+    }
+    if (finalAmount < 0) {
+      throw new Error('Khong the de so tien la gia tri am o day');
+    }
+    return new Money(finalCurrency, finalAmount);
   }
 
   add(other: Money): Money {

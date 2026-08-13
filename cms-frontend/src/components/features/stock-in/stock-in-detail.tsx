@@ -1,5 +1,4 @@
 // src/components/features/stock-in/stock-in-detail.tsx
-
 "use client";
 
 import { useState } from "react";
@@ -7,20 +6,16 @@ import { ArrowLeft, CheckCircle2, Send, XCircle } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-
-import { StockIn } from "@/types/stock-in.types";
+import { StockIn, StockInItemDraft } from "@/types/stock-in.types";
+import { Product } from "@/types/product.types";
+import { stockInService } from "@/services/stock-in.service";
 
 import { StockInStatusBadge } from "./stock-in-status-badge";
 import { StockInInfo } from "./stock-in-info";
 import { StockInItemsEditor } from "./stock-in-items-editor";
-
 import { StockInSubmitDialog } from "./stock-in-submit-dialog";
 import { StockInApproveDialog } from "./stock-in-approve-dialog";
 import { StockInRejectDialog } from "./stock-in-reject-dialog";
-
-import { Product } from "@/types/product.types";
-
-import { StockInItemDraft } from "@/types/stock-in.types";
 
 interface Props {
   initialStockIn: StockIn;
@@ -28,41 +23,124 @@ interface Props {
 
 export function StockInDetail({ initialStockIn }: Props) {
   const [stockIn, setStockIn] = useState<StockIn>(initialStockIn);
+  const [items, setItems] = useState<StockInItemDraft[]>(
+    (initialStockIn.items ?? []).map((item) => ({
+      tempId: item.id,
+      productId: item.productId,
+      productName: item.productName,
+      productSku: item.productSku,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      currency: item.currency,
+    })),
+  );
 
+  // ← Thêm các state còn thiếu vào đây
   const [submitOpen, setSubmitOpen] = useState(false);
-
   const [approveOpen, setApproveOpen] = useState(false);
-
   const [rejectOpen, setRejectOpen] = useState(false);
 
   const isDraft = stockIn.status === "draft";
   const isPending = stockIn.status === "pending";
 
-  const items: StockInItemDraft[] = (stockIn.items ?? []).map((item) => ({
-    tempId: item.id,
-    productId: item.productId,
-    productName: item.productName,
-    productSku: item.productSku,
-    quantity: item.quantity,
-    unitPrice: item.unitPrice,
-    currency: item.currency,
-  }));
-
-  function handleAdd(_product: Product) {
-    // Detail editor nên gọi API addItem.
-    // Có thể triển khai ở đây hoặc tách mutation hook.
+  async function handleAdd(product: Product) {
+    try {
+      await stockInService.addItem(stockIn.id, {
+        productId: product.id,
+        quantity: 1,
+        unitPrice: product.costPrice,
+        currency: product.currency,
+      });
+      const fresh = await stockInService.getById(stockIn.id);
+      setStockIn(fresh);
+      setItems(
+        (fresh.items ?? []).map((item) => ({
+          tempId: item.id,
+          productId: item.productId,
+          productName: item.productName,
+          productSku: item.productSku,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          currency: item.currency,
+        })),
+      );
+    } catch (error) {
+      console.error("Add item failed:", error);
+    }
   }
 
-  function handleChange(
-    _itemId: string,
-    _field: "quantity" | "unitPrice",
-    _value: number,
+  async function handleChange(
+    itemId: string,
+    field: "quantity" | "unitPrice",
+    value: number,
   ) {
-    // Tương tự: gọi stockInService.updateItem().
+    setItems((prev) =>
+      prev.map((item) =>
+        item.tempId === itemId ? { ...item, [field]: value } : item,
+      ),
+    );
+
+    try {
+      const item = items.find((i) => i.tempId === itemId);
+      if (!item) return;
+
+      await stockInService.updateItem(stockIn.id, itemId, {
+        quantity: field === "quantity" ? value : item.quantity,
+        unitPrice: field === "unitPrice" ? value : item.unitPrice,
+        currency: item.currency,
+      });
+    } catch (error) {
+      console.error("Update item failed:", error);
+      setItems(
+        (stockIn.items ?? []).map((item) => ({
+          tempId: item.id,
+          productId: item.productId,
+          productName: item.productName,
+          productSku: item.productSku,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          currency: item.currency,
+        })),
+      );
+    }
   }
 
-  function handleRemove(_itemId: string) {
-    // Gọi stockInService.removeItem().
+  async function handleRemove(itemId: string) {
+    setItems((prev) => prev.filter((i) => i.tempId !== itemId));
+
+    try {
+      await stockInService.removeItem(stockIn.id, itemId);
+      const fresh = await stockInService.getById(stockIn.id);
+      setStockIn(fresh);
+    } catch (error) {
+      console.error("Remove item failed:", error);
+      setItems(
+        (stockIn.items ?? []).map((item) => ({
+          tempId: item.id,
+          productId: item.productId,
+          productName: item.productName,
+          productSku: item.productSku,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          currency: item.currency,
+        })),
+      );
+    }
+  }
+
+  async function handleSuccess(fresh: StockIn) {
+    setStockIn(fresh);
+    setItems(
+      (fresh.items ?? []).map((item) => ({
+        tempId: item.id,
+        productId: item.productId,
+        productName: item.productName,
+        productSku: item.productSku,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        currency: item.currency,
+      })),
+    );
   }
 
   return (
@@ -82,10 +160,8 @@ export function StockInDetail({ initialStockIn }: Props) {
               <h1 className="font-mono text-lg font-semibold text-slate-900">
                 {stockIn.code}
               </h1>
-
               <StockInStatusBadge status={stockIn.status} />
             </div>
-
             <p className="mt-1 text-sm text-slate-500">
               Tạo lúc {new Date(stockIn.createdAt).toLocaleString("vi-VN")}
             </p>
@@ -136,7 +212,6 @@ export function StockInDetail({ initialStockIn }: Props) {
             Danh sách sản phẩm
           </h2>
         </div>
-
         <div className="p-6">
           <StockInItemsEditor
             items={items}
@@ -154,21 +229,21 @@ export function StockInDetail({ initialStockIn }: Props) {
         stockIn={stockIn}
         open={submitOpen}
         onOpenChange={setSubmitOpen}
-        onSuccess={setStockIn}
+        onSuccess={handleSuccess}
       />
 
       <StockInApproveDialog
         stockIn={stockIn}
         open={approveOpen}
         onOpenChange={setApproveOpen}
-        onSuccess={setStockIn}
+        onSuccess={handleSuccess}
       />
 
       <StockInRejectDialog
         stockIn={stockIn}
         open={rejectOpen}
         onOpenChange={setRejectOpen}
-        onSuccess={setStockIn}
+        onSuccess={handleSuccess}
       />
     </div>
   );

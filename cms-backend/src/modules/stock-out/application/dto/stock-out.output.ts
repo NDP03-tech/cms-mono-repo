@@ -23,30 +23,48 @@ export class StockOutItemOutput {
   }
 }
 
+export interface StockOutEnrichment {
+  customerName?: string;
+  createdByName?: string;
+}
+
 export class StockOutOutput {
   id: string;
   code: string;
   customerId: string;
+  customerName?: string;
   createdBy: string;
+  createdByName?: string;
   status: StockOutEnum;
   totalAmount: number;
   currency: string;
   items: StockOutItemOutput[];
   approvedAt?: Date;
   createdAt: Date;
+  recipientName?: string;
+  recipientPhone?: string;
+  note?: string;
 
-  static from(stockOut: StockOut): StockOutOutput {
+  static from(
+    stockOut: StockOut,
+    enrichment?: StockOutEnrichment,
+  ): StockOutOutput {
     const output = new StockOutOutput();
     output.id = stockOut.id;
     output.code = stockOut.code.toString();
     output.customerId = stockOut.customerId;
+    output.customerName = enrichment?.customerName;
     output.createdBy = stockOut.createdBy;
+    output.createdByName = enrichment?.createdByName;
     output.status = stockOut.status;
     output.totalAmount = stockOut.totalAmount.amountValue;
     output.currency = stockOut.totalAmount.currencyValue;
     output.items = stockOut.items.map(StockOutItemOutput.from);
     output.approvedAt = stockOut.approvedAt;
     output.createdAt = stockOut.createdAt;
+    output.recipientName = stockOut.recipientName;
+    output.recipientPhone = stockOut.recipientPhone;
+    output.note = stockOut.note;
     return output;
   }
 }

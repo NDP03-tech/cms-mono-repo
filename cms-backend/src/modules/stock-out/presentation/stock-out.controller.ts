@@ -9,6 +9,7 @@ import {
   Body,
   Query,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { CreateStockOutUseCase } from '../application/use-cases/create-stock-out.use-case';
 import { AddStockOutItemUseCase } from '../application/use-cases/add-stock-out-item.use-case';
@@ -50,7 +51,14 @@ export class StockOutController {
   // ----------------------------------------------------------------
 
   @Post()
-  create(@Body() input: CreateStockOutInput) {
+  create(@Body() input: CreateStockOutInput, @Req() req: any) {
+    // Dùng user đã authenticate từ JWT làm người tạo,
+    // bỏ qua createdBy client tự gửi lên (tránh giả mạo).
+    const user = req.user as any;
+    if (user && user.id) {
+      input.createdBy = user.id;
+    }
+
     return this.createStockOut.execute(input);
   }
 
@@ -69,28 +77,34 @@ export class StockOutController {
   // ----------------------------------------------------------------
 
   @Post(':id/items')
-  addItem(
+  async addItem(
     @Param('id') stockOutId: string,
     @Body() input: CreateStockOutItemInput,
   ) {
-    return this.addStockOutItem.execute(stockOutId, input);
+    await this.addStockOutItem.execute(stockOutId, input);
+    return this.getStockOut.execute(stockOutId);
   }
 
   @Patch(':id/items/:itemId')
-  updateItem(
+  async updateItem(
     @Param('id') stockOutId: string,
     @Param('itemId') itemId: string,
     @Body() input: UpdateStockOutItemInput,
   ) {
-    return this.updateStockOutItem.execute(stockOutId, {
+    await this.updateStockOutItem.execute(stockOutId, {
       ...input,
       itemId,
     });
+    return this.getStockOut.execute(stockOutId);
   }
 
   @Delete(':id/items/:itemId')
-  removeItem(@Param('id') stockOutId: string, @Param('itemId') itemId: string) {
-    return this.removeStockOutItem.execute(stockOutId, itemId);
+  async removeItem(
+    @Param('id') stockOutId: string,
+    @Param('itemId') itemId: string,
+  ) {
+    await this.removeStockOutItem.execute(stockOutId, itemId);
+    return this.getStockOut.execute(stockOutId);
   }
 
   // ----------------------------------------------------------------

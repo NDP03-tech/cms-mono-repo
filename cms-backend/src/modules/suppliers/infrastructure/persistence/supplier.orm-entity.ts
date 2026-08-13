@@ -22,7 +22,8 @@ export class SupplierOrmEntity {
     unique: true,
   })
   address: string | null;
-
+  @Column({ nullable: true })
+  code?: string;
   @Column({
     type: 'varchar',
     nullable: true,

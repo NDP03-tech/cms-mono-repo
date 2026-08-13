@@ -25,6 +25,6 @@ import { RegisterUseCase } from '../application/use-cases/register.use-case';
     JwtStrategy,
     { provide: USER_REPOSITORY, useClass: UserRepository },
   ],
-  exports: [PassportModule, JwtModule],
+  exports: [PassportModule, JwtModule, USER_REPOSITORY],
 })
 export class AuthModule {}

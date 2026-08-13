@@ -141,22 +141,16 @@ export function StockInForm({ createdBy, currency = "VND" }: StockInFormProps) {
   /**
    * Submit
    */
+  // stock-in-form.tsx — fix router.push
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
     setError(null);
 
-    /**
-     * Validate supplier
-     */
     if (!supplierId) {
       setError("Vui lòng chọn nhà cung cấp.");
       return;
     }
 
-    /**
-     * Validate products
-     */
     if (items.length === 0) {
       setError("Vui lòng thêm ít nhất một sản phẩm.");
       return;
@@ -167,9 +161,7 @@ export function StockInForm({ createdBy, currency = "VND" }: StockInFormProps) {
     try {
       const input: CreateStockInInput = {
         supplierId,
-        createdBy,
         currency,
-
         items: items.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
@@ -178,12 +170,9 @@ export function StockInForm({ createdBy, currency = "VND" }: StockInFormProps) {
         })),
       };
 
-      const stockIn = await stockInService.create(input);
-
-      router.push(`/stock-in/${stockIn.id}`);
-    } catch (error) {
-      console.error("Create stock-in failed:", error);
-
+      const stockInId = await stockInService.create(input);
+      router.push(`/stock-in/${stockInId}`);
+    } catch {
       setError("Không thể tạo phiếu nhập. Vui lòng kiểm tra lại thông tin.");
     } finally {
       setLoading(false);

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import type {
   ISupplierRepository,
   SupplierFilters,
@@ -19,6 +19,23 @@ export class SupplierRepository implements ISupplierRepository {
   async findById(id: string): Promise<Supplier | null> {
     const orm = await this.repository.findOneBy({ id });
     return orm ? SupplierMapper.toDomain(orm) : null;
+  }
+
+  async findByIds(ids: string[]): Promise<Supplier[]> {
+    const validIds = ids
+      .map((id) => id.trim())
+      .filter(
+        (id) =>
+          id.length > 0 &&
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+            id,
+          ),
+      );
+
+    if (validIds.length === 0) return [];
+
+    const ormEntities = await this.repository.findBy({ id: In(validIds) });
+    return ormEntities.map((orm) => SupplierMapper.toDomain(orm));
   }
 
   async findByName(name: string): Promise<Supplier[]> {
