@@ -14,6 +14,7 @@ export class User extends BaseEntity {
     public readonly password: HashedPassword,
     public readonly role: Role,
     public readonly isActive: boolean,
+    public readonly fullName: string | null,
     createdAt: Date,
     updatedAt: Date,
   ) {
@@ -28,6 +29,7 @@ export class User extends BaseEntity {
     passwordHash: string;
     role: Role;
     isActive?: boolean;
+    fullName?: string;
   }): User {
     if (!props.username || props.username.trim().length === 0) {
       throw new DomainException('Username không được để trống');
@@ -48,6 +50,7 @@ export class User extends BaseEntity {
       HashedPassword.createFromHash(props.passwordHash),
       props.role,
       props.isActive ?? true,
+      props.fullName?.trim() || null,
       now,
       now,
     );
@@ -61,6 +64,7 @@ export class User extends BaseEntity {
     passwordHash: string;
     role: Role;
     isActive: boolean;
+    fullName?: string | null;
     createdAt: Date;
     updatedAt: Date;
   }): User {
@@ -70,6 +74,7 @@ export class User extends BaseEntity {
       HashedPassword.createFromHash(props.passwordHash),
       props.role,
       props.isActive,
+      props.fullName ?? null,
       props.createdAt,
       props.updatedAt,
     );
@@ -79,6 +84,11 @@ export class User extends BaseEntity {
 
   isAdmin(): boolean {
     return this.role === Role.ADMIN;
+  }
+
+  /** Tên hiển thị: ưu tiên họ tên đầy đủ, fallback về username nếu chưa nhập. */
+  get displayName(): string {
+    return this.fullName ?? this.username;
   }
 
   changeRole(newRole: Role): User {
@@ -92,6 +102,7 @@ export class User extends BaseEntity {
       this.password,
       newRole,
       this.isActive,
+      this.fullName,
       this.createdAt,
       new Date(),
     );
@@ -104,6 +115,24 @@ export class User extends BaseEntity {
       newHashedPassword,
       this.role,
       this.isActive,
+      this.fullName,
+      this.createdAt,
+      new Date(),
+    );
+  }
+
+  updateFullName(fullName: string): User {
+    if (!fullName || fullName.trim().length === 0) {
+      throw new DomainException('Họ tên không được để trống');
+    }
+
+    return new User(
+      this.id,
+      this.username,
+      this.password,
+      this.role,
+      this.isActive,
+      fullName.trim(),
       this.createdAt,
       new Date(),
     );
@@ -120,6 +149,7 @@ export class User extends BaseEntity {
       this.password,
       this.role,
       false,
+      this.fullName,
       this.createdAt,
       new Date(),
     );
@@ -136,6 +166,7 @@ export class User extends BaseEntity {
       this.password,
       this.role,
       true,
+      this.fullName,
       this.createdAt,
       new Date(),
     );

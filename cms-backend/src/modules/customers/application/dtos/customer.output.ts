@@ -6,6 +6,7 @@ export class CustomerOutput {
   phone?: string;
   email?: string;
   isActive: boolean;
+  address?: string;
 
   static from(customer: Customer): CustomerOutput {
     const output = new CustomerOutput();
@@ -14,6 +15,7 @@ export class CustomerOutput {
     output.phone = customer.phone?.toString();
     output.email = customer.email?.toString();
     output.isActive = customer.isActive;
+    output.address = customer.address;
     return output;
   }
 }

@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 import { Customer } from "@/types/customer.types";
 import { customerService } from "@/services/customer.service";
@@ -30,6 +31,8 @@ const schema = z.object({
     .email("Email không hợp lệ")
     .optional()
     .or(z.literal("")),
+
+  address: z.string().trim().optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -63,15 +66,10 @@ export function CustomerSheet({
       name: "",
       phone: "",
       email: "",
+      address: "",
     },
   });
 
-  /**
-   * Populate form khi:
-   * - Mở Sheet
-   * - Chuyển create -> edit
-   * - Chuyển sang customer khác
-   */
   useEffect(() => {
     if (!open) {
       return;
@@ -81,6 +79,7 @@ export function CustomerSheet({
       name: customer?.name ?? "",
       phone: customer?.phone ?? "",
       email: customer?.email ?? "",
+      address: customer?.address ?? "",
     });
 
     setSubmitError(null);
@@ -284,6 +283,42 @@ export function CustomerSheet({
 
                 {errors.email && (
                   <p className="text-xs text-red-600">{errors.email.message}</p>
+                )}
+              </div>
+
+              {/* ADDRESS */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="customer-address"
+                  className="text-sm font-medium text-slate-700"
+                >
+                  Địa chỉ
+                </Label>
+
+                <Textarea
+                  id="customer-address"
+                  {...register("address")}
+                  disabled={isLoading}
+                  placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"
+                  rows={3}
+                  className="
+                    w-full
+                    resize-none
+                    border-slate-200
+                    bg-white
+                    text-sm
+                    shadow-sm
+                    placeholder:text-slate-400
+                    focus-visible:border-slate-400
+                    focus-visible:ring-1
+                    focus-visible:ring-slate-400
+                  "
+                />
+
+                {errors.address && (
+                  <p className="text-xs text-red-600">
+                    {errors.address.message}
+                  </p>
                 )}
               </div>
             </div>

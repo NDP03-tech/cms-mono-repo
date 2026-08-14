@@ -23,4 +23,11 @@ export class CustomerOrmEntity {
 
   @Column({ default: true })
   isActive: boolean;
+
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    unique: true,
+  })
+  address: string | null;
 }

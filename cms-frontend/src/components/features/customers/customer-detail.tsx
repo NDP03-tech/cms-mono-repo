@@ -3,7 +3,15 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Mail, Phone, Package, Pencil, Plus } from "lucide-react";
+import {
+  ArrowLeft,
+  Mail,
+  Phone,
+  MapPin,
+  Package,
+  Pencil,
+  Plus,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { customerService } from "@/services/customer.service";
@@ -109,7 +117,7 @@ export function CustomerDetail({ customerId, onEdit }: CustomerDetailProps) {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg border border-slate-200 p-4">
           <p className="text-xs font-medium text-slate-500 uppercase tracking-wide flex items-center gap-1.5">
             <Phone className="h-3.5 w-3.5" /> Điện thoại
@@ -121,6 +129,14 @@ export function CustomerDetail({ customerId, onEdit }: CustomerDetailProps) {
             <Mail className="h-3.5 w-3.5" /> Email
           </p>
           <p className="text-sm text-slate-900 mt-2">{customer.email || "—"}</p>
+        </div>
+        <div className="bg-white rounded-lg border border-slate-200 p-4">
+          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide flex items-center gap-1.5">
+            <MapPin className="h-3.5 w-3.5" /> Địa chỉ
+          </p>
+          <p className="text-sm text-slate-900 mt-2">
+            {customer.address || "—"}
+          </p>
         </div>
         <div className="bg-white rounded-lg border border-slate-200 p-4">
           <p className="text-xs font-medium text-slate-500 uppercase tracking-wide flex items-center gap-1.5">

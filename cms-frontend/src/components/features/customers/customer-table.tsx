@@ -28,6 +28,7 @@ export function CustomerTable({
                 "Tên khách hàng",
                 "Số điện thoại",
                 "Email",
+                "Địa chỉ",
                 "Trạng thái",
                 "",
               ].map((h) => (
@@ -43,7 +44,7 @@ export function CustomerTable({
           <tbody className="divide-y divide-slate-100">
             {Array.from({ length: 5 }).map((_, i) => (
               <tr key={i}>
-                {Array.from({ length: 5 }).map((_, j) => (
+                {Array.from({ length: 6 }).map((_, j) => (
                   <td key={j} className="px-4 py-3">
                     <Skeleton className="h-4 w-full bg-slate-100" />
                   </td>
@@ -90,6 +91,9 @@ export function CustomerTable({
                 Email
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">
+                Địa chỉ
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">
                 Trạng thái
               </th>
               <th className="px-4 py-3 w-[80px]" />
@@ -109,6 +113,12 @@ export function CustomerTable({
                 </td>
                 <td className="px-4 py-3 text-sm text-slate-600">
                   {customer.email || "—"}
+                </td>
+                <td
+                  className="px-4 py-3 text-sm text-slate-600 max-w-[220px] truncate"
+                  title={customer.address}
+                >
+                  {customer.address || "—"}
                 </td>
                 <td className="px-4 py-3">
                   {customer.isActive ? (

@@ -16,6 +16,7 @@ export class CreateCustomerUseCase {
       name: input.name,
       phone: input.phone,
       email: input.email,
+      address: input.address,
     });
 
     await this.customerRepo.save(customer);

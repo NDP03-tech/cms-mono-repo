@@ -1,11 +1,15 @@
 // src/types/stock-out.types.ts
 
-// Đã xác nhận: StockOutEnum ở BE là chữ thường.
 export type StockOutStatus = "draft" | "pending" | "approved" | "rejected";
 
 export interface StockOutItem {
   id: string;
   productId: string;
+  // BE (StockOutItemOutput) chưa enrich 2 field này — FE tự join bằng
+  // src/lib/enrich-stock-out.ts (withProductNames) cho tới khi BE làm
+  // enrichment tương tự customerName.
+  productName?: string;
+  productSku?: string;
   quantity: number;
   unitPrice: number;
   totalPrice: number;
@@ -23,12 +27,11 @@ export interface StockOut {
   items: StockOutItem[];
   approvedAt?: string;
   createdAt: string;
-
-  // KHÔNG có trong StockOutOutput trả về từ BE — đây là field FE tự gắn thêm
-  // sau khi fetch (xem lib/enrich-stock-out.ts). Luôn optional, đừng đọc trực
-  // tiếp field này ngay sau stockOutService.list()/getById() mà chưa enrich.
   customerName?: string;
   createdByName?: string;
+  recipientName?: string;
+  recipientPhone?: string;
+  note?: string;
 }
 
 export interface CreateStockOutItemInput {
@@ -44,6 +47,10 @@ export interface CreateStockOutInput {
   createdBy?: string;
   currency: string;
   items: CreateStockOutItemInput[];
+  // Người trực tiếp nhận hàng — có thể khác khách hàng đã đăng ký.
+  recipientName?: string;
+  recipientPhone?: string;
+  note?: string;
 }
 
 export interface UpdateStockOutItemInput {

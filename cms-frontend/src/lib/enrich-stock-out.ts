@@ -1,33 +1,52 @@
 // src/lib/enrich-stock-out.ts
 //
-// BE trả StockOutOutput chỉ có customerId/createdBy (id thuần), không kèm tên.
-// 2 hàm này gắn thêm customerName ở phía FE bằng cách join với danh sách
-// Customer đã fetch riêng (qua customerService). Nếu sau này BE enrich sẵn
-// tên trong response, có thể bỏ bước gọi 2 hàm này đi.
-import type { Customer } from "@/types/customer.types";
-import type { StockOut } from "@/types/stock-out.types";
+// BE (StockOutOutput/StockOutItemOutput) đã enrich customerName nhưng CHƯA
+// enrich productName/productSku trên từng item. Các hàm dưới đây join dữ
+// liệu ở phía FE bằng danh sách customer/product đã fetch sẵn, dùng như
+// fallback (nếu BE trả customerName thì giữ nguyên) hoặc để bù trực tiếp
+// cho productName còn thiếu.
 
-export function withCustomerNames<T extends StockOut>(
-  stockOuts: T[],
+import { StockOut, StockOutItem } from "@/types/stock-out.types";
+import { Customer } from "@/types/customer.types";
+import { Product } from "@/types/product.types";
+
+export function withCustomerNames(
+  stockOuts: StockOut[],
   customers: Customer[],
-): T[] {
+): StockOut[] {
   const nameById = new Map(customers.map((c) => [c.id, c.name]));
-  return stockOuts.map((s) => ({
-    ...s,
-    customerName: s.customerName ?? nameById.get(s.customerId) ?? s.customerId,
+
+  return stockOuts.map((stockOut) => ({
+    ...stockOut,
+    customerName: stockOut.customerName ?? nameById.get(stockOut.customerId),
   }));
 }
 
-export function withCustomerName<T extends StockOut>(
-  stockOut: T,
+export function withProductNames(
+  items: StockOutItem[],
+  products: Product[],
+): StockOutItem[] {
+  const productById = new Map(products.map((p) => [p.id, p]));
+
+  return items.map((item) => {
+    const product = productById.get(item.productId);
+    return {
+      ...item,
+      productName: item.productName ?? product?.name ?? item.productId,
+      productSku: item.productSku ?? product?.sku,
+    };
+  });
+}
+
+/** Enrich cả customerName lẫn productName của từng item trong 1 stockOut. */
+export function enrichStockOut(
+  stockOut: StockOut,
   customers: Customer[],
-): T {
-  const nameById = new Map(customers.map((c) => [c.id, c.name]));
+  products: Product[],
+): StockOut {
+  const [enriched] = withCustomerNames([stockOut], customers);
   return {
-    ...stockOut,
-    customerName:
-      stockOut.customerName ??
-      nameById.get(stockOut.customerId) ??
-      stockOut.customerId,
+    ...enriched,
+    items: withProductNames(enriched.items, products),
   };
 }

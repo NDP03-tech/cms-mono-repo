@@ -17,6 +17,7 @@ export class UpdateCustomerUseCase {
     if (input.name !== undefined) customer.updateName(input.name);
     if (input.phone !== undefined) customer.updatePhone(input.phone);
     if (input.email !== undefined) customer.updateEmail(input.email);
+    if (input.address !== undefined) customer.updateAddress(input.address);
     if (input.isActive === true) customer.activate();
     if (input.isActive === false) customer.deactivate();
 

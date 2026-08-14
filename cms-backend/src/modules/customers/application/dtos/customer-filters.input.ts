@@ -4,4 +4,5 @@ export interface CustomerFiltersInput {
   isActive?: boolean;
   page?: number;
   limit?: number;
+  address?: string;
 }

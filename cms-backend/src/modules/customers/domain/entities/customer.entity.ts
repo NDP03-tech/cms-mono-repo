@@ -7,6 +7,7 @@ export interface CreateCustomerProps {
   name: string;
   phone?: string;
   email?: string;
+  address?: string;
 }
 
 export interface CustomerProps {
@@ -15,6 +16,7 @@ export interface CustomerProps {
   phone?: Phone;
   email?: Email;
   isActive: boolean;
+  address?: string;
 }
 
 export class Customer {
@@ -24,6 +26,7 @@ export class Customer {
     private _phone: Phone | undefined,
     private _email: Email | undefined,
     private _isActive: boolean,
+    private _address: string | undefined,
   ) {}
 
   // ----------------------------------------------------------------
@@ -37,6 +40,7 @@ export class Customer {
       props.phone ? Phone.create(props.phone) : undefined,
       props.email ? Email.create(props.email) : undefined,
       true,
+      props.address,
     );
   }
 
@@ -47,6 +51,7 @@ export class Customer {
       props.phone,
       props.email,
       props.isActive,
+      props.address,
     );
   }
 
@@ -56,7 +61,11 @@ export class Customer {
 
   updateName(name: string): void {
     const trimmed = name?.trim();
-    if (!trimmed) throw new Error('Customer name cannot be empty');
+
+    if (!trimmed) {
+      throw new Error('Customer name cannot be empty');
+    }
+
     this._name = trimmed;
   }
 
@@ -68,12 +77,19 @@ export class Customer {
     this._email = email ? Email.create(email) : undefined;
   }
 
+  updateAddress(address: string | undefined): void {
+    this._address = address;
+  }
+
   activate(): void {
     this._isActive = true;
   }
 
   deactivate(): void {
-    if (!this._isActive) throw new Error('Customer is already inactive');
+    if (!this._isActive) {
+      throw new Error('Customer is already inactive');
+    }
+
     this._isActive = false;
   }
 
@@ -84,15 +100,23 @@ export class Customer {
   get id(): string {
     return this._id;
   }
+
   get name(): string {
     return this._name;
   }
+
   get phone(): Phone | undefined {
     return this._phone;
   }
+
   get email(): Email | undefined {
     return this._email;
   }
+
+  get address(): string | undefined {
+    return this._address;
+  }
+
   get isActive(): boolean {
     return this._isActive;
   }

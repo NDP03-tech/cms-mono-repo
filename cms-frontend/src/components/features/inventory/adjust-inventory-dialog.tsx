@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { InventoryBalance } from "@/types/inventory.types";
+import { inventoryService } from "@/services/inventory.service";
 
 const schema = z.object({
   newQuantity: z.coerce.number().min(0, "Số lượng không được âm"),
@@ -70,17 +71,16 @@ export function AdjustInventoryDialog({
     setIsLoading(true);
     setError(null);
     try {
-      // Khi kết nối BE thật:
-      // await inventoryService.adjust({
-      //   productId: balance.productId,
-      //   newQuantity: values.newQuantity,
-      //   reason: values.reason,
-      // });
+      await inventoryService.adjust({
+        productId: balance.productId,
+        newQuantity: values.newQuantity,
+        reason: values.reason,
+      });
 
-      await new Promise((resolve) => setTimeout(resolve, 400));
       onSuccess(balance.productId, values.newQuantity);
       onClose();
-    } catch {
+    } catch (err) {
+      console.error("Adjust inventory failed:", err);
       setError("Có lỗi xảy ra. Vui lòng thử lại.");
     } finally {
       setIsLoading(false);

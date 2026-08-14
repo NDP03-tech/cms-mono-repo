@@ -69,4 +69,9 @@ export class CustomerRepository implements ICustomerRepository {
   async delete(id: string): Promise<void> {
     await this.repository.delete(id);
   }
+
+  async findAdress(address: string): Promise<Customer | null> {
+    const orm = await this.repository.findOneBy({ address });
+    return orm ? CustomerMapper.toDomain(orm) : null;
+  }
 }

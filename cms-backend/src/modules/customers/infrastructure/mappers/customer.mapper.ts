@@ -11,6 +11,7 @@ export class CustomerMapper {
       phone: orm.phone ? Phone.create(orm.phone) : undefined,
       email: orm.email ? Email.create(orm.email) : undefined,
       isActive: orm.isActive,
+      address: orm.address ?? undefined,
     });
   }
 
@@ -21,6 +22,7 @@ export class CustomerMapper {
     orm.phone = customer.phone?.toString() ?? null;
     orm.email = customer.email?.toString() ?? null;
     orm.isActive = customer.isActive;
+    orm.address = customer.address ?? null;
     return orm;
   }
 }

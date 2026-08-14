@@ -23,6 +23,10 @@ export class UserOrmEntity {
   @Column({ name: 'is_active', default: true })
   isActive: boolean;
 
+  // Họ tên hiển thị — nullable vì user cũ trong DB chưa có dữ liệu này.
+  @Column({ name: 'full_name', type: 'varchar', nullable: true })
+  fullName: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

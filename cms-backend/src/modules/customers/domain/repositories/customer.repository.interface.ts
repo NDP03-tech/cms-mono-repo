@@ -17,4 +17,5 @@ export interface ICustomerRepository {
   existsById(id: string): Promise<boolean>;
   save(customer: Customer): Promise<void>;
   delete(id: string): Promise<void>;
+  findAdress(address: string): Promise<Customer | null>;
 }

@@ -2,6 +2,10 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { CustomersModule } from '../customers/infrastructure/customers.module';
+// Đường dẫn dưới đây suy theo pattern của CustomersModule ('../customers/infrastructure/customers.module')
+// và theo cách stock-out.controller.ts import JwtAuthGuard ('../../auth/infrastructure/guards/jwt-auth.guard').
+// Nếu AuthModule thật sự nằm ở path khác, chỉnh lại dòng import này.
+import { AuthModule } from '../auth/infrastructure/auth.module';
 
 import { StockOutController } from './presentation/stock-out.controller';
 
@@ -20,12 +24,15 @@ import { StockOutOrmEntity } from './infrastructure/persistence/stock-out.orm-en
 import { StockOutItemOrmEntity } from './infrastructure/persistence/stock-out-item.orm-entity';
 
 import { STOCK_OUT_REPOSITORY } from './domain/repositories/stock-out.repository.interface';
+import { InventoryModule } from '../inventory/inventory.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([StockOutOrmEntity, StockOutItemOrmEntity]),
 
     CustomersModule,
+    InventoryModule,
+    AuthModule,
   ],
 
   controllers: [StockOutController],

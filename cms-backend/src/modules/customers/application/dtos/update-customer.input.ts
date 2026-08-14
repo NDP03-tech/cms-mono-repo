@@ -3,4 +3,5 @@ export interface UpdateCustomerInput {
   phone?: string;
   email?: string;
   isActive?: boolean;
+  address?: string;
 }
