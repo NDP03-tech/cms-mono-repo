@@ -14,13 +14,14 @@ import { AdjustInventoryUseCase } from './application/use-cases/adjust-inventory
 import { RecordStockInUseCase } from './application/use-cases/record-stock-in.use-case';
 import { RecordStockOutUseCase } from './application/use-cases/record-stock-out.use-case';
 import { CheckStockAvailabilityUseCase } from './application/use-cases/check-stock-availability.use-case';
-
+import { ProductsModule } from '../products/infrastructure/products.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       InventoryBalanceOrmEntity,
       InventoryTransactionOrmEntity,
     ]),
+    ProductsModule,
   ],
   controllers: [InventoryController],
   providers: [

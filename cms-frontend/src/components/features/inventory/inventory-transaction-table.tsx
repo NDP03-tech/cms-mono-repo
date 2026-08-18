@@ -1,6 +1,8 @@
 // src/components/features/inventory/inventory-transaction-table.tsx
 "use client";
 
+import Link from "next/link";
+import { ArrowDownCircle, ArrowUpCircle, RotateCcw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   InventoryTransaction,
@@ -9,26 +11,49 @@ import {
 
 const typeConfig: Record<
   InventoryTransactionType,
-  { label: string; className: string; sign: string }
+  {
+    label: string;
+    textClassName: string;
+    sign: string;
+    icon: typeof ArrowDownCircle;
+  }
 > = {
-  stock_in: {
-    label: "Nhập kho",
-    className:
-      "inline-flex items-center rounded-md bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20",
+  "stock-in": {
+    label: "Nhập",
+    textClassName: "text-emerald-600",
     sign: "+",
+    icon: ArrowDownCircle,
   },
-  stock_out: {
-    label: "Xuất kho",
-    className:
-      "inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20",
+  "stock-out": {
+    label: "Xuất",
+    textClassName: "text-blue-600",
     sign: "-",
+    icon: ArrowUpCircle,
   },
   adjustment: {
     label: "Điều chỉnh",
-    className:
-      "inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20",
+    textClassName: "text-amber-600",
     sign: "±",
+    icon: RotateCcw,
   },
+};
+
+// Dùng khi tx.type trả về giá trị không nằm trong typeConfig (BE thêm loại
+// giao dịch mới, dữ liệu null/sai định dạng...) — tránh crash toàn bảng chỉ
+// vì 1 dòng dữ liệu lạ.
+const fallbackConfig = {
+  label: "Khác",
+  textClassName: "text-slate-500",
+  sign: "",
+  icon: RotateCcw,
+};
+
+// referenceType không có trong InventoryTransactionType (chỉ 3 giá trị đó)
+// nên khai riêng phần route/label cho tham chiếu để dễ mở rộng sau này.
+const referenceConfig: Record<string, { label: string; href: string }> = {
+  stock_in: { label: "Xem phiếu nhập", href: "/stock-in" },
+  stock_out: { label: "Xem phiếu xuất", href: "/stock-out" },
+  adjustment: { label: "Xem điều chỉnh", href: "/inventory/adjustments" },
 };
 
 interface InventoryTransactionTableProps {
@@ -46,22 +71,20 @@ export function InventoryTransactionTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50">
-              {["Sản phẩm", "Loại", "Số lượng", "Tham chiếu", "Thời gian"].map(
-                (h) => (
-                  <th
-                    key={h}
-                    className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide"
-                  >
-                    {h}
-                  </th>
-                ),
-              )}
+              {["Sản phẩm", "Số lượng", "Tham chiếu", "Thời gian"].map((h) => (
+                <th
+                  key={h}
+                  className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide"
+                >
+                  {h}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {Array.from({ length: 5 }).map((_, i) => (
               <tr key={i}>
-                {Array.from({ length: 5 }).map((_, j) => (
+                {Array.from({ length: 4 }).map((_, j) => (
                   <td key={j} className="px-4 py-3">
                     <Skeleton className="h-4 w-full bg-slate-100" />
                   </td>
@@ -99,9 +122,6 @@ export function InventoryTransactionTable({
                 Sản phẩm
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">
-                Loại
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">
                 Số lượng
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">
@@ -114,7 +134,21 @@ export function InventoryTransactionTable({
           </thead>
           <tbody className="divide-y divide-slate-100">
             {transactions.map((tx) => {
-              const config = typeConfig[tx.type];
+              // InventoryTransactionType enum ở BE dùng "stock-in"/"stock-out"
+              // (gạch nối), đã xác nhận và khớp với typeConfig phía trên.
+              // .trim() chỉ để phòng khoảng trắng thừa từ dữ liệu cũ.
+              const normalizedType = String(tx.type).trim();
+              const config =
+                typeConfig[normalizedType as InventoryTransactionType] ??
+                fallbackConfig;
+              const Icon = config.icon;
+              const normalizedRefType = tx.referenceType
+                ? String(tx.referenceType).toLowerCase().trim()
+                : undefined;
+              const ref = normalizedRefType
+                ? referenceConfig[normalizedRefType]
+                : undefined;
+
               return (
                 <tr key={tx.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-4 py-3">
@@ -126,30 +160,25 @@ export function InventoryTransactionTable({
                     </p>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={config.className}>{config.label}</span>
-                  </td>
-                  <td className="px-4 py-3">
                     <span
-                      className={
-                        tx.type === "stock_in"
-                          ? "text-sm font-semibold text-emerald-600"
-                          : tx.type === "stock_out"
-                            ? "text-sm font-semibold text-blue-600"
-                            : "text-sm font-semibold text-amber-600"
-                      }
+                      className={`inline-flex items-center gap-1.5 text-sm font-semibold ${config.textClassName}`}
                     >
-                      {config.sign}
+                      <Icon className="h-4 w-4" />
+                      {config.label} {config.sign}
                       {tx.quantity}
                     </span>
                   </td>
-                  <td className="px-4 py-3 font-mono text-xs text-slate-500">
-                    {tx.referenceType === "stock_in"
-                      ? "Phiếu nhập"
-                      : tx.referenceType === "stock_out"
-                        ? "Phiếu xuất"
-                        : "Điều chỉnh"}
-                    {" · "}
-                    {tx.referenceId.slice(0, 8)}...
+                  <td className="px-4 py-3 text-xs">
+                    {ref && tx.referenceId ? (
+                      <Link
+                        href={`${ref.href}/${tx.referenceId}`}
+                        className="font-medium text-slate-600 underline decoration-slate-300 underline-offset-2 hover:text-slate-900 hover:decoration-slate-500"
+                      >
+                        {ref.label}
+                      </Link>
+                    ) : (
+                      <span className="text-slate-400">—</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-sm text-slate-500">
                     {new Date(tx.createdAt).toLocaleString("vi-VN")}

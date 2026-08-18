@@ -56,6 +56,7 @@ export function InventoryList() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchBalances();
     fetchTransactions();
   }, [fetchBalances, fetchTransactions]);

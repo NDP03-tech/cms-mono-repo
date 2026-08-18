@@ -1,3 +1,5 @@
+import { randomUUID } from 'crypto';
+
 export interface InventoryBalanceProps {
   id: string;
   productId: string;
@@ -13,7 +15,7 @@ export class InventoryBalance {
     private _updatedAt: Date,
   ) {}
   static create(productId: string): InventoryBalance {
-    return new InventoryBalance(productId, productId, 0, new Date());
+    return new InventoryBalance(randomUUID(), productId, 0, new Date());
   }
 
   static reconstitute(props: InventoryBalanceProps): InventoryBalance {

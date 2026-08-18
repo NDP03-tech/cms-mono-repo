@@ -23,7 +23,7 @@ interface StockInFormProps {
   currency?: string;
 }
 
-export function StockInForm({ createdBy, currency = "VND" }: StockInFormProps) {
+export function StockInForm({ currency = "VND" }: StockInFormProps) {
   const router = useRouter();
 
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);

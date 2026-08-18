@@ -1,5 +1,5 @@
-// src/types/inventory.types.ts
-export type InventoryTransactionType = "stock_in" | "stock_out" | "adjustment";
+
+export type InventoryTransactionType = "stock-in" | "stock-out" | "adjustment";
 
 export interface InventoryBalance {
   id: string;

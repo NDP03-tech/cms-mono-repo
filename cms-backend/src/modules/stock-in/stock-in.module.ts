@@ -17,11 +17,14 @@ import { STOCK_IN_REPOSITORY } from './domain/repositories/stock-in.repository.i
 import { AuthModule } from '../auth/infrastructure/auth.module';
 import { SuppliersModule } from '../suppliers/infrastructure/suppliers.module';
 import { ProductsModule } from '../products/infrastructure/products.module';
+import { InventoryModule } from '../inventory/inventory.module';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([StockInOrmEntity, StockInItemOrmEntity]),
-    SuppliersModule, // ← thêm dòng này
-    ProductsModule, // ← thêm dòng này
+    SuppliersModule,
+    ProductsModule,
+    InventoryModule,
     AuthModule,
   ],
   controllers: [StockInController],

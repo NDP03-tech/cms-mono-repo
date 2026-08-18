@@ -7,7 +7,7 @@ import { StockOutModule } from './modules/stock-out/stock-out.module';
 import { CustomersModule } from './modules/customers/infrastructure/customers.module';
 import { SuppliersModule } from './modules/suppliers/infrastructure/suppliers.module';
 import { ProductsModule } from './modules/products/infrastructure/products.module';
-
+import { ReportsModule } from './modules/reports/reports.module';
 const dbType = (
   process.env.DB_TYPE || (process.env.DB_HOST ? 'postgres' : 'sqljs')
 ).toLowerCase();
@@ -52,6 +52,7 @@ const dbConfig =
     CustomersModule,
     SuppliersModule,
     ProductsModule,
+    ReportsModule,
   ],
 })
 export class AppModule {}

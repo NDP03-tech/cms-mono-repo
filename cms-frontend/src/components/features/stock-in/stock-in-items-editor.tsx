@@ -4,11 +4,7 @@
 
 import { useMemo } from "react";
 import { Plus } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-
 import { StockInItemDraft } from "@/types/stock-in.types";
-
 import { StockInItemRow } from "./stock-in-item-row";
 import { StockInProductPicker } from "./stock-in-product-picker";
 
@@ -31,6 +27,11 @@ interface Props {
 
   onRemove: (itemId: string) => void;
 }
+
+// Cùng 1 giá trị grid-cols dùng chung cho cả header lẫn từng row (StockInItemRow)
+// để 2 bên luôn thẳng hàng — cột SL (140px) đủ chỗ cho nút -/+, cột Đơn giá
+// (170px) đủ rộng để số không bị dính sát viền khi có dấu phân cách nghìn.
+const GRID_COLS = "grid-cols-[1fr_140px_170px_150px_40px]";
 
 export function StockInItemsEditor({
   items,
@@ -59,7 +60,9 @@ export function StockInItemsEditor({
       )}
 
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-        <div className="grid grid-cols-[1fr_100px_150px_150px_40px] gap-4 border-b border-slate-200 bg-slate-50 px-4 py-3">
+        <div
+          className={`grid ${GRID_COLS} gap-4 border-b border-slate-200 bg-slate-50 px-4 py-3`}
+        >
           <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
             Sản phẩm
           </span>
@@ -68,11 +71,11 @@ export function StockInItemsEditor({
             SL
           </span>
 
-          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <span className="text-right text-xs font-semibold uppercase tracking-wide text-slate-500">
             Đơn giá
           </span>
 
-          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <span className="text-right text-xs font-semibold uppercase tracking-wide text-slate-500">
             Thành tiền
           </span>
 
@@ -109,7 +112,7 @@ export function StockInItemsEditor({
             <div className="text-right">
               <p className="text-xs text-slate-400">Tổng tiền</p>
 
-              <p className="mt-1 text-lg font-semibold text-slate-900">
+              <p className="mt-1 text-lg font-semibold text-slate-900 tabular-nums">
                 {total.toLocaleString("vi-VN")} {currency}
               </p>
             </div>

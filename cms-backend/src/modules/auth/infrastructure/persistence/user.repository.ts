@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { IUserRepository } from '../../domain/repositories/user.repository.interface';
+import {
+  IUserRepository,
+  UserFilters,
+} from '../../domain/repositories/user.repository.interface';
 import { User } from '../../domain/entities/user.entity';
 import { UserOrmEntity } from '../orm/user.orm-entity';
 import { UserMapper } from '../mappers/user.mapper';
@@ -52,6 +55,30 @@ export class UserRepository implements IUserRepository {
   async existsByUsername(username: string): Promise<boolean> {
     const count: number = await this.userRepo.count({ where: { username } });
     return count > 0;
+  }
+
+  async findAll(filters?: UserFilters): Promise<User[]> {
+    const qb = this.userRepo.createQueryBuilder('user');
+
+    if (filters?.role) {
+      qb.andWhere('user.role = :role', { role: filters.role });
+    }
+
+    if (filters?.isActive !== undefined) {
+      qb.andWhere('user.isActive = :isActive', {
+        isActive: filters.isActive,
+      });
+    }
+
+    if (filters?.page && filters?.limit) {
+      const skip = (filters.page - 1) * filters.limit;
+      qb.skip(skip).take(filters.limit);
+    }
+
+    qb.orderBy('user.createdAt', 'DESC');
+
+    const rows = await qb.getMany();
+    return rows.map((row) => UserMapper.toDomain(row));
   }
 
   async save(user: User): Promise<void> {
