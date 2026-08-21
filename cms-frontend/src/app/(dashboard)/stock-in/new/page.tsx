@@ -12,9 +12,6 @@ import { StockInForm } from "@/components/features/stock-in/stock-in-form";
 export default function NewStockInPage() {
   const router = useRouter();
 
-  const supplierId = "";
-  const createdBy = "";
-
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <div className="flex items-start gap-4">
@@ -38,11 +35,7 @@ export default function NewStockInPage() {
         </div>
       </div>
 
-      <StockInForm
-        supplierId={supplierId}
-        createdBy={createdBy}
-        currency="VND"
-      />
+      <StockInForm currency="VND" />
     </div>
   );
 }

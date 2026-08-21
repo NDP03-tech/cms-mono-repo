@@ -10,6 +10,7 @@ export interface Supplier {
 }
 
 export interface SupplierFilters {
+  search?: string;
   name?: string;
   isActive?: boolean;
   page?: number;

@@ -31,6 +31,7 @@ export interface UpdateProductInput {
 
 // GIẢ ĐỊNH — chưa thấy product-filters.input.ts thật, đổi lại nếu khác.
 export interface ProductFilters {
+  search?: string;
   name?: string;
   sku?: string;
   isActive?: boolean;

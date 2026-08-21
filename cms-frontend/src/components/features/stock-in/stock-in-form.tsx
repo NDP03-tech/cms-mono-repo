@@ -19,7 +19,6 @@ import { stockInService } from "@/services/stock-in.service";
 import { supplierService } from "@/services/supplier.service";
 
 interface StockInFormProps {
-  createdBy: string;
   currency?: string;
 }
 

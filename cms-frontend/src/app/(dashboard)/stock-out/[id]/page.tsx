@@ -11,8 +11,6 @@ import { stockOutService } from "@/services/stock-out.service";
 import { customerService } from "@/services/customer.service";
 import { withCustomerNames } from "@/lib/enrich-stock-out";
 
-const CURRENT_USER_IS_ADMIN = true;
-
 export default function StockOutDetailPage() {
   const params = useParams<{ id: string }>();
 
@@ -33,10 +31,8 @@ export default function StockOutDetailPage() {
         let enriched = data;
         try {
           const customer = await customerService.getById(data.customerId);
-          enriched = withCustomerNames(data, [customer]);
-        } catch {
-          
-        }
+          [enriched] = withCustomerNames([data], [customer]);
+        } catch {}
 
         setStockOut(enriched);
       } catch (err) {
@@ -68,10 +64,5 @@ export default function StockOutDetailPage() {
     );
   }
 
-  return (
-    <StockOutDetail
-      initialStockOut={stockOut}
-      canApprove={CURRENT_USER_IS_ADMIN}
-    />
-  );
+  return <StockOutDetail initialStockOut={stockOut} />;
 }

@@ -92,10 +92,14 @@ export function SupplierSheet({
     setSubmitError(null);
 
     try {
-      const result =
-        isEdit && supplier
-          ? await supplierService.update(supplier.id, values)
-          : await supplierService.create(values);
+      let result: Supplier;
+      if (isEdit && supplier) {
+        await supplierService.update(supplier.id, values);
+        result = await supplierService.getById(supplier.id);
+      } else {
+        const supplierId = await supplierService.create(values);
+        result = await supplierService.getById(supplierId);
+      }
 
       onSuccess(result);
       onClose();

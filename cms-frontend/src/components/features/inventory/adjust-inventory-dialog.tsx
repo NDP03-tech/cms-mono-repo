@@ -21,7 +21,7 @@ import { InventoryBalance } from "@/types/inventory.types";
 import { inventoryService } from "@/services/inventory.service";
 
 const schema = z.object({
-  newQuantity: z.coerce.number().min(0, "Số lượng không được âm"),
+  newQuantity: z.number().min(0, "Số lượng không được âm"),
   reason: z.string().min(1, "Vui lòng nhập lý do điều chỉnh"),
 });
 
@@ -129,7 +129,7 @@ export function AdjustInventoryDialog({
               Số lượng mới <span className="text-red-500">*</span>
             </Label>
             <Input
-              {...register("newQuantity")}
+              {...register("newQuantity", { valueAsNumber: true })}
               type="number"
               min={0}
               className="h-9 border-slate-200 text-sm focus-visible:ring-slate-900"

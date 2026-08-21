@@ -82,12 +82,11 @@ export function CustomerSheet({
       address: customer?.address ?? "",
     });
 
-    setSubmitError(null);
+    const timer = setTimeout(() => setSubmitError(null), 0);
+
+    return () => clearTimeout(timer);
   }, [open, customer, reset]);
 
-  /**
-   * Create / Update customer
-   */
   const onSubmit: SubmitHandler<FormValues> = async (values) => {
     setIsLoading(true);
     setSubmitError(null);
@@ -97,23 +96,16 @@ export function CustomerSheet({
 
       if (isEdit && customer) {
         // UPDATE
-        result = await customerService.update(customer.id, values);
+        await customerService.update(customer.id, values);
+        result = await customerService.getById(customer.id);
       } else {
         // CREATE
-        result = await customerService.create(values);
+        const customerId = await customerService.create(values);
+        result = await customerService.getById(customerId);
       }
 
-      /**
-       * API thành công
-       *
-       * Trả customer mới/cập nhật về component cha
-       * để component cha refresh/update table.
-       */
       onSuccess(result);
 
-      /**
-       * Chỉ đóng Sheet sau khi API thành công.
-       */
       onClose();
     } catch (error: unknown) {
       console.error("Customer submit error:", error);
@@ -131,9 +123,6 @@ export function CustomerSheet({
     }
   };
 
-  /**
-   * Không cho đóng Sheet trong lúc đang gọi API.
-   */
   const handleSheetChange = (nextOpen: boolean) => {
     if (!nextOpen && !isLoading) {
       onClose();
@@ -154,7 +143,7 @@ export function CustomerSheet({
           sm:max-w-md
         "
       >
-        {/* HEADER */}
+        {}
         <SheetHeader className="shrink-0 border-b px-6 py-5">
           <SheetTitle className="text-lg font-semibold text-slate-900">
             {isEdit ? "Chỉnh sửa khách hàng" : "Thêm khách hàng"}
@@ -167,15 +156,15 @@ export function CustomerSheet({
           </p>
         </SheetHeader>
 
-        {/* FORM */}
+        {}
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="flex min-h-0 flex-1 flex-col"
         >
-          {/* CONTENT */}
+          {}
           <div className="min-h-0 flex-1 overflow-y-auto">
             <div className="w-full space-y-6 px-6 py-6">
-              {/* API ERROR */}
+              {}
               {submitError && (
                 <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
                   <p className="text-sm leading-5 text-red-600">
@@ -184,7 +173,7 @@ export function CustomerSheet({
                 </div>
               )}
 
-              {/* NAME */}
+              {}
               <div className="space-y-2">
                 <Label
                   htmlFor="customer-name"
@@ -218,7 +207,7 @@ export function CustomerSheet({
                 )}
               </div>
 
-              {/* PHONE */}
+              {}
               <div className="space-y-2">
                 <Label
                   htmlFor="customer-phone"
@@ -252,7 +241,7 @@ export function CustomerSheet({
                 )}
               </div>
 
-              {/* EMAIL */}
+              {}
               <div className="space-y-2">
                 <Label
                   htmlFor="customer-email"
@@ -286,7 +275,7 @@ export function CustomerSheet({
                 )}
               </div>
 
-              {/* ADDRESS */}
+              {}
               <div className="space-y-2">
                 <Label
                   htmlFor="customer-address"
@@ -324,7 +313,7 @@ export function CustomerSheet({
             </div>
           </div>
 
-          {/* FOOTER */}
+          {}
           <div className="shrink-0 border-t bg-white px-6 py-4">
             <div className="flex w-full gap-3">
               <Button
@@ -360,9 +349,6 @@ export function CustomerSheet({
   );
 }
 
-/**
- * Lấy message từ Axios error / API response.
- */
 function getApiErrorMessage(error: unknown, fallback: string): string {
   if (typeof error === "object" && error !== null && "response" in error) {
     const response = (

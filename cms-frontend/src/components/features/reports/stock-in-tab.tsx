@@ -119,7 +119,13 @@ export function StockInTab({ filters }: { filters: ReportFilters }) {
                   }).format(v)
                 }
               />
-              <Tooltip formatter={(v: number) => formatCurrency(v)} />
+              <Tooltip
+                formatter={(value) =>
+                  formatCurrency(
+                    typeof value === "number" ? value : Number(value ?? 0),
+                  )
+                }
+              />
               <Bar
                 dataKey="value"
                 name="Giá trị nhập"

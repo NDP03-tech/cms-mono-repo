@@ -60,7 +60,6 @@ export function StockInSheet({
 
       const stockInId = await stockInService.create({
         supplierId,
-        createdBy,
         currency,
       });
 

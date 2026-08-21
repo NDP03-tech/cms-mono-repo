@@ -1,6 +1,7 @@
 // src/app/(dashboard)/stock-out/new/page.tsx
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -8,6 +9,14 @@ import { ArrowLeft } from "lucide-react";
 import { StockOutForm } from "@/components/features/stock-out/stock-out-form";
 
 export default function NewStockOutPage() {
+  return (
+    <Suspense>
+      <NewStockOutContent />
+    </Suspense>
+  );
+}
+
+function NewStockOutContent() {
   const searchParams = useSearchParams();
   const initialCustomerId = searchParams.get("customerId") ?? undefined;
 
