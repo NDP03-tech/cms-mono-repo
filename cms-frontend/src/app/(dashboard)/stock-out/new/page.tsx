@@ -8,7 +8,6 @@ import { ArrowLeft } from "lucide-react";
 import { StockOutForm } from "@/components/features/stock-out/stock-out-form";
 
 export default function NewStockOutPage() {
-  // Cho phép điều hướng từ trang chi tiết khách hàng: /stock-out/new?customerId=...
   const searchParams = useSearchParams();
   const initialCustomerId = searchParams.get("customerId") ?? undefined;
 

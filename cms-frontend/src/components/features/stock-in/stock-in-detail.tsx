@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { StockIn, StockInItemDraft } from "@/types/stock-in.types";
 import { Product } from "@/types/product.types";
 import { stockInService } from "@/services/stock-in.service";
+import { useIsAdmin, useIsStaff } from "@/hooks/use-current-user";
 
 import { StockInStatusBadge } from "./stock-in-status-badge";
 import { StockInInfo } from "./stock-in-info";
@@ -39,6 +40,8 @@ export function StockInDetail({ initialStockIn }: Props) {
   const [submitOpen, setSubmitOpen] = useState(false);
   const [approveOpen, setApproveOpen] = useState(false);
   const [rejectOpen, setRejectOpen] = useState(false);
+  const isAdmin = useIsAdmin();
+  const isStaff = useIsStaff();
 
   const isDraft = stockIn.status === "draft";
   const isPending = stockIn.status === "pending";
@@ -169,7 +172,7 @@ export function StockInDetail({ initialStockIn }: Props) {
         </div>
 
         <div className="flex gap-2">
-          {isDraft && (
+          {isDraft && isStaff && (
             <Button
               onClick={() => setSubmitOpen(true)}
               className="bg-slate-900 hover:bg-slate-800"
@@ -179,7 +182,7 @@ export function StockInDetail({ initialStockIn }: Props) {
             </Button>
           )}
 
-          {isPending && (
+          {isPending && isAdmin && (
             <>
               <Button
                 variant="outline"
@@ -216,7 +219,7 @@ export function StockInDetail({ initialStockIn }: Props) {
           <StockInItemsEditor
             items={items}
             currency={stockIn.currency}
-            readOnly={!isDraft}
+            readOnly={!isDraft || !isStaff}
             onAdd={handleAdd}
             onChange={handleChange}
             onRemove={handleRemove}

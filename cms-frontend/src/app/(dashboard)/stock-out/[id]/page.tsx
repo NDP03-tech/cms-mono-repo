@@ -11,7 +11,6 @@ import { stockOutService } from "@/services/stock-out.service";
 import { customerService } from "@/services/customer.service";
 import { withCustomerNames } from "@/lib/enrich-stock-out";
 
-// TODO: thay bằng session hook thật — quyết định có hiện nút Duyệt/Từ chối hay không.
 const CURRENT_USER_IS_ADMIN = true;
 
 export default function StockOutDetailPage() {
@@ -36,7 +35,7 @@ export default function StockOutDetailPage() {
           const customer = await customerService.getById(data.customerId);
           enriched = withCustomerNames(data, [customer]);
         } catch {
-          // Khách hàng có thể đã bị xoá — vẫn hiển thị phiếu, chỉ thiếu tên.
+          
         }
 
         setStockOut(enriched);

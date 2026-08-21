@@ -10,6 +10,7 @@ interface CustomerTableProps {
   isLoading: boolean;
   onEdit: (customer: Customer) => void;
   onDelete: (customer: Customer) => void;
+  canDelete: boolean;
 }
 
 export function CustomerTable({
@@ -17,6 +18,7 @@ export function CustomerTable({
   isLoading,
   onEdit,
   onDelete,
+  canDelete,
 }: CustomerTableProps) {
   if (isLoading) {
     return (
@@ -139,12 +141,14 @@ export function CustomerTable({
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
-                    <button
-                      onClick={() => onDelete(customer)}
-                      className="h-7 w-7 flex items-center justify-center rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                    {canDelete && (
+                      <button
+                        onClick={() => onDelete(customer)}
+                        className="h-7 w-7 flex items-center justify-center rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>

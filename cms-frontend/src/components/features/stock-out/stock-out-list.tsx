@@ -23,6 +23,7 @@ import { StockOutTable } from "./stock-out-table";
 import { StockOutSubmitDialog } from "./stock-out-submit-dialog";
 import { StockOutApproveDialog } from "./stock-out-approve-dialog";
 import { StockOutRejectDialog } from "./stock-out-reject-dialog";
+import { useIsAdmin, useIsStaff } from "@/hooks/use-current-user";
 
 export function StockOutList() {
   const [allStockOuts, setAllStockOuts] = useState<StockOut[]>([]);
@@ -37,6 +38,8 @@ export function StockOutList() {
   const [rejectTarget, setRejectTarget] = useState<StockOut | null>(null);
 
   const router = useRouter();
+  const isAdmin = useIsAdmin();
+  const isStaff = useIsStaff();
 
   const fetchStockOuts = useCallback(async () => {
     setIsLoading(true);
@@ -116,6 +119,7 @@ export function StockOutList() {
 
         <Button
           type="button"
+          hidden={!isStaff}
           size="sm"
           className="h-9 bg-slate-900 text-sm hover:bg-slate-800"
           onClick={() => router.push("/stock-out/new")}
@@ -164,9 +168,11 @@ export function StockOutList() {
         stockOuts={stockOuts}
         isLoading={isLoading}
         onView={handleView}
-        onSubmit={(stockOut) => setSubmitTarget(stockOut)}
-        onApprove={(stockOut) => setApproveTarget(stockOut)}
-        onReject={(stockOut) => setRejectTarget(stockOut)}
+        onSubmit={isStaff ? (stockOut) => setSubmitTarget(stockOut) : undefined}
+        onApprove={
+          isAdmin ? (stockOut) => setApproveTarget(stockOut) : undefined
+        }
+        onReject={isAdmin ? (stockOut) => setRejectTarget(stockOut) : undefined}
       />
 
       <StockOutSubmitDialog

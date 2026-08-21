@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -20,26 +20,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import { authService } from "@/services/auth.service";
-
-function getCurrentUserRole(): string | undefined {
-  if (typeof window === "undefined") {
-    return undefined;
-  }
-
-  const token = localStorage.getItem("access_token");
-
-  if (!token) {
-    return undefined;
-  }
-
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-
-    return payload.role;
-  } catch {
-    return undefined;
-  }
-}
+import { useIsAdmin } from "@/hooks/use-current-user";
 
 const navItems = [
   {
@@ -58,13 +39,13 @@ const navItems = [
     label: "Sản phẩm",
     href: "/products",
     icon: Package,
-    adminOnly: true,
+    adminOnly: false,
   },
   {
     label: "Nhà cung cấp",
     href: "/suppliers",
     icon: Truck,
-    adminOnly: true,
+    adminOnly: false,
   },
   {
     label: "Khách hàng",
@@ -99,33 +80,28 @@ const navItems = [
 ];
 
 export function Sidebar() {
-  const [isAdmin] = useState(() => getCurrentUserRole() === "ADMIN");
-
   const pathname = usePathname();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+  const isAdmin = useIsAdmin();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   function handleLogout() {
     authService.logout();
     router.push("/login");
   }
 
-  /*
-   * Chỉ filter UI.
-   *
-   * adminOnly = true:
-   *   ADMIN -> hiển thị
-   *   USER  -> ẩn
-   *
-   * adminOnly = false:
-   *   ADMIN và USER đều hiển thị
-   *
-   * Backend vẫn chịu trách nhiệm authorization thật.
-   */
-  const visibleNavItems = navItems.filter((item) => !item.adminOnly || isAdmin);
+  
+  const visibleNavItems = navItems.filter(
+    (item) => !item.adminOnly || (mounted && isAdmin),
+  );
 
   return (
     <aside className="flex min-h-screen w-60 flex-col border-r border-slate-200 bg-white">
-      {/* Logo */}
+      {}
       <div className="flex h-14 items-center border-b border-slate-200 px-4">
         <div className="flex items-center gap-2.5">
           <div className="flex h-7 w-7 items-center justify-center rounded-md bg-slate-900">
@@ -138,15 +114,17 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Nav */}
+      {}
       <nav className="flex-1 space-y-0.5 p-3">
         {visibleNavItems.map((item) => {
           const Icon = item.icon;
 
+          
           const isActive =
-            item.href === "/"
+            mounted &&
+            (item.href === "/"
               ? pathname === "/"
-              : pathname.startsWith(item.href);
+              : pathname === item.href || pathname.startsWith(`${item.href}/`));
 
           return (
             <Link
@@ -167,7 +145,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Logout */}
+      {}
       <div className="border-t border-slate-200 p-3">
         <button
           type="button"

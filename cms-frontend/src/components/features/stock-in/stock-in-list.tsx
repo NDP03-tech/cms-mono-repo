@@ -7,6 +7,7 @@ import { stockInService } from "@/services/stock-in.service";
 import { StockIn } from "@/types/stock-in.types";
 import { Button } from "@/components/ui/button";
 import { StockInTable } from "./stock-in-table";
+import { useIsStaff } from "@/hooks/use-current-user";
 
 export function StockInList() {
   const [stockIns, setStockIns] = useState<StockIn[]>([]);
@@ -14,6 +15,7 @@ export function StockInList() {
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
+  const isStaff = useIsStaff();
 
   const fetchStockIns = useCallback(async () => {
     setIsLoading(true);
@@ -51,7 +53,11 @@ export function StockInList() {
           </p>
         </div>
 
-        <Button type="button" onClick={() => router.push("/stock-in/new")}>
+        <Button
+          type="button"
+          hidden={!isStaff}
+          onClick={() => router.push("/stock-in/new")}
+        >
           Thêm phiếu nhập
         </Button>
       </div>

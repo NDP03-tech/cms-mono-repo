@@ -51,6 +51,7 @@ export class StockOutController {
   // ----------------------------------------------------------------
 
   @Post()
+  @Roles(Role.STAFF)
   create(@Body() input: CreateStockOutInput, @Req() req: any) {
     // Dùng user đã authenticate từ JWT làm người tạo,
     // bỏ qua createdBy client tự gửi lên (tránh giả mạo).
@@ -63,11 +64,13 @@ export class StockOutController {
   }
 
   @Get()
+  @Roles(Role.ADMIN, Role.STAFF)
   list(@Query() filters: StockOutFiltersInput) {
     return this.listStockOuts.execute(filters);
   }
 
   @Get(':id')
+  @Roles(Role.ADMIN, Role.STAFF)
   get(@Param('id') id: string) {
     return this.getStockOut.execute(id);
   }
@@ -77,6 +80,7 @@ export class StockOutController {
   // ----------------------------------------------------------------
 
   @Post(':id/items')
+  @Roles(Role.STAFF)
   async addItem(
     @Param('id') stockOutId: string,
     @Body() input: CreateStockOutItemInput,
@@ -86,6 +90,7 @@ export class StockOutController {
   }
 
   @Patch(':id/items/:itemId')
+  @Roles(Role.STAFF)
   async updateItem(
     @Param('id') stockOutId: string,
     @Param('itemId') itemId: string,
@@ -99,6 +104,7 @@ export class StockOutController {
   }
 
   @Delete(':id/items/:itemId')
+  @Roles(Role.STAFF)
   async removeItem(
     @Param('id') stockOutId: string,
     @Param('itemId') itemId: string,
@@ -112,6 +118,7 @@ export class StockOutController {
   // ----------------------------------------------------------------
 
   @Patch(':id/submit')
+  @Roles(Role.STAFF)
   submit(@Param('id') id: string) {
     return this.submitStockOut.execute(id);
   }

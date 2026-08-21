@@ -19,8 +19,10 @@ import { ProductDeleteDialog } from "@/components/features/products/product-dele
 
 import { productService } from "@/services/product.service";
 import { Product } from "@/types/product.types";
+import { useIsAdmin } from "@/hooks/use-current-user";
 
 export default function ProductsPage() {
+  const isAdmin = useIsAdmin();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -98,7 +100,7 @@ export default function ProductsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page header */}
+      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-lg font-semibold text-slate-900">Sản phẩm</h1>
@@ -109,6 +111,7 @@ export default function ProductsPage() {
         </div>
 
         <Button
+          hidden={!isAdmin}
           onClick={handleAddNew}
           size="sm"
           className="h-9 bg-slate-900 text-sm hover:bg-slate-800"
@@ -118,7 +121,7 @@ export default function ProductsPage() {
         </Button>
       </div>
 
-      {/* Filters */}
+      {}
       <div className="flex items-center gap-3">
         <div className="relative max-w-xs flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -148,17 +151,18 @@ export default function ProductsPage() {
         </p>
       </div>
 
-      {/* Table */}
+      {}
       <ProductTable
         products={filteredProducts}
         isLoading={isLoading}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        canManage={isAdmin}
       />
 
-      {/* Create / Edit Sheet */}
+      {}
       <ProductSheet
-        open={sheetOpen}
+        open={isAdmin && sheetOpen}
         onClose={() => {
           setSheetOpen(false);
           setEditProduct(null);
@@ -167,7 +171,7 @@ export default function ProductsPage() {
         product={editProduct}
       />
 
-      {/* Delete Dialog */}
+      {}
       <ProductDeleteDialog
         open={deleteOpen}
         onClose={() => {

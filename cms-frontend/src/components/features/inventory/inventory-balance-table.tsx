@@ -9,12 +9,14 @@ interface InventoryBalanceTableProps {
   balances: InventoryBalance[];
   isLoading: boolean;
   onAdjust: (balance: InventoryBalance) => void;
+  canAdjust: boolean;
 }
 
 export function InventoryBalanceTable({
   balances,
   isLoading,
   onAdjust,
+  canAdjust,
 }: InventoryBalanceTableProps) {
   if (isLoading) {
     return (
@@ -139,13 +141,15 @@ export function InventoryBalanceTable({
                   {new Date(balance.updatedAt).toLocaleString("vi-VN")}
                 </td>
                 <td className="px-4 py-3">
-                  <button
-                    onClick={() => onAdjust(balance)}
-                    className="h-7 w-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-                    title="Điều chỉnh tồn kho"
-                  >
-                    <Settings2 className="h-3.5 w-3.5" />
-                  </button>
+                  {canAdjust && (
+                    <button
+                      onClick={() => onAdjust(balance)}
+                      className="h-7 w-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                      title="Điều chỉnh tồn kho"
+                    >
+                      <Settings2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

@@ -1,8 +1,15 @@
 // src/components/features/users/user-table.tsx
 "use client";
 
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Ban } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
 import { User } from "@/types/user.types";
 
 interface UserTableProps {
@@ -26,16 +33,20 @@ export function UserTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50">
-              {["Tên đăng nhập", "Vai trò", "Trạng thái", "Ngày tạo", ""].map(
-                (h) => (
-                  <th
-                    key={h}
-                    className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide"
-                  >
-                    {h}
-                  </th>
-                ),
-              )}
+              {[
+                "Tên đăng nhập",
+                "Vai trò",
+                "Trạng thái",
+                "Họ và tên",
+                "Thao tác",
+              ].map((h) => (
+                <th
+                  key={h}
+                  className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide"
+                >
+                  {h}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -88,9 +99,11 @@ export function UserTable({
                 Trạng thái
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">
-                Ngày tạo
+                Họ và tên
               </th>
-              <th className="px-4 py-3 w-[80px]" />
+              <th className="px-4 py-3 w-[100px] text-right text-xs font-medium text-slate-500 uppercase tracking-wide">
+                Thao tác
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -98,11 +111,11 @@ export function UserTable({
               <tr key={user.id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <div className="h-7 w-7 rounded-full bg-slate-900 flex items-center justify-center">
-                      <span className="text-xs font-medium text-white">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-slate-900 text-xs font-medium text-white">
                         {user.username.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
+                      </AvatarFallback>
+                    </Avatar>
                     <div>
                       <p className="text-sm font-medium text-slate-700">
                         {user.username}
@@ -136,25 +149,50 @@ export function UserTable({
                   )}
                 </td>
                 <td className="px-4 py-3 text-sm text-slate-500">
-                  {new Date(user.createdAt).toLocaleDateString("vi-VN")}
+                  {user.fullName || "-"}
                 </td>
                 <td className="px-4 py-3">
-                  <div className="flex items-center justify-end gap-1">
-                    <button
-                      onClick={() => onEdit(user)}
-                      disabled={currentUserId === user.id}
-                      className="h-7 w-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                      onClick={() => onDelete(user)}
-                      disabled={currentUserId === user.id}
-                      className="h-7 w-7 flex items-center justify-center rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
+                  <TooltipProvider delayDuration={200}>
+                    <div className="flex items-center justify-end gap-1">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={() => onEdit(user)}
+                            disabled={currentUserId === user.id}
+                            className="h-8 w-8 p-0 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {currentUserId === user.id
+                            ? "Không thể tự chỉnh sửa tài khoản của mình"
+                            : "Chỉnh sửa"}
+                        </TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={() => onDelete(user)}
+                            disabled={
+                              currentUserId === user.id || !user.isActive
+                            }
+                            className="h-8 w-8 p-0 flex items-center justify-center rounded-md text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                          >
+                            <Ban className="h-3.5 w-3.5" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {currentUserId === user.id
+                            ? "Không thể tự vô hiệu hóa tài khoản của mình"
+                            : !user.isActive
+                              ? "Đã vô hiệu hóa — vào Sửa để kích hoạt lại"
+                              : "Vô hiệu hóa"}
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </TooltipProvider>
                 </td>
               </tr>
             ))}

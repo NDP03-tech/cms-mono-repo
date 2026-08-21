@@ -3,6 +3,20 @@ import type { NextRequest } from "next/server";
 
 const PUBLIC_ROUTES = ["/login"];
 
+function getRoleFromToken(token: string): string | undefined {
+  try {
+    const encodedPayload = token.split(".")[1];
+    if (!encodedPayload) return undefined;
+
+    const base64 = encodedPayload.replace(/-/g, "+").replace(/_/g, "/");
+    const payload = JSON.parse(atob(base64)) as { role?: string };
+
+    return payload.role;
+  } catch {
+    return undefined;
+  }
+}
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -25,6 +39,12 @@ export function proxy(request: NextRequest) {
   // Đã đăng nhập nhưng truy cập /login
   if (token && isPublicRoute) {
     return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  if (token && (pathname === "/users" || pathname.startsWith("/users/"))) {
+    if (getRoleFromToken(token) === "STAFF") {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
   }
 
   return NextResponse.next();

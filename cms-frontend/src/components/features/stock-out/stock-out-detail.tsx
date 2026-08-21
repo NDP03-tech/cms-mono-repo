@@ -11,6 +11,7 @@ import { Product } from "@/types/product.types";
 import { stockOutService } from "@/services/stock-out.service";
 import { productService } from "@/services/product.service";
 import { withProductNames } from "@/lib/enrich-stock-out";
+import { useIsAdmin, useIsStaff } from "@/hooks/use-current-user";
 
 import { StockOutStatusBadge } from "./stock-out-status-badge";
 import { StockOutInfo } from "./stock-out-info";
@@ -78,6 +79,8 @@ export function StockOutDetail({ initialStockOut }: Props) {
   const [submitOpen, setSubmitOpen] = useState(false);
   const [approveOpen, setApproveOpen] = useState(false);
   const [rejectOpen, setRejectOpen] = useState(false);
+  const isAdmin = useIsAdmin();
+  const isStaff = useIsStaff();
 
   const isDraft = stockOut.status === "draft";
   const isPending = stockOut.status === "pending";
@@ -167,7 +170,7 @@ export function StockOutDetail({ initialStockOut }: Props) {
         </div>
 
         <div className="flex gap-2">
-          {isDraft && (
+          {isDraft && isStaff && (
             <Button
               onClick={() => setSubmitOpen(true)}
               className="bg-slate-900 hover:bg-slate-800"
@@ -177,7 +180,7 @@ export function StockOutDetail({ initialStockOut }: Props) {
             </Button>
           )}
 
-          {isPending && (
+          {isPending && isAdmin && (
             <>
               <Button
                 variant="outline"
@@ -214,7 +217,7 @@ export function StockOutDetail({ initialStockOut }: Props) {
           <StockOutItemsEditor
             items={items}
             currency={stockOut.currency}
-            readOnly={!isDraft}
+            readOnly={!isDraft || !isStaff}
             onAdd={handleAdd}
             onChange={handleChange}
             onRemove={handleRemove}

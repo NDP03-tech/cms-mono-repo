@@ -35,11 +35,13 @@ export class InventoryController {
   // ----------------------------------------------------------------
 
   @Get('balances')
+  @Roles(Role.ADMIN, Role.STAFF)
   listBalances(@Query() filters: InventoryBalanceFilters) {
     return this.listInventoryBalances.execute(filters);
   }
 
   @Get('balances/:productId')
+  @Roles(Role.ADMIN, Role.STAFF)
   getBalance(@Param('productId') productId: string) {
     return this.getInventoryBalance.execute(productId);
   }
@@ -55,6 +57,7 @@ export class InventoryController {
   // ----------------------------------------------------------------
 
   @Get('transactions')
+  @Roles(Role.ADMIN, Role.STAFF)
   listTransactions(@Query() filters: InventoryTransactionFiltersInput) {
     return this.listInventoryTransactions.execute(filters);
   }

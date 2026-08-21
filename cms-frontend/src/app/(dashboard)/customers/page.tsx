@@ -17,8 +17,10 @@ import { CustomerSheet } from "@/components/features/customers/customer-sheet";
 import { CustomerDeleteDialog } from "@/components/features/customers/customer-delete-dialog";
 import { Customer } from "@/types/customer.types";
 import { customerService } from "@/services/customer.service";
+import { useIsAdmin } from "@/hooks/use-current-user";
 
 export default function CustomersPage() {
+  const isAdmin = useIsAdmin();
   const [allCustomers, setAllCustomers] = useState<Customer[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -96,7 +98,7 @@ export default function CustomersPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page header */}
+      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-lg font-semibold text-slate-900">Khách hàng</h1>
@@ -114,7 +116,7 @@ export default function CustomersPage() {
         </Button>
       </div>
 
-      {/* Filters */}
+      {}
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -140,15 +142,16 @@ export default function CustomersPage() {
         </p>
       </div>
 
-      {/* Table */}
+      {}
       <CustomerTable
         customers={customers}
         isLoading={isLoading}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        canDelete={isAdmin}
       />
 
-      {/* Sheet */}
+      {}
       <CustomerSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
@@ -156,7 +159,7 @@ export default function CustomersPage() {
         customer={editCustomer}
       />
 
-      {/* Delete Dialog */}
+      {}
       <CustomerDeleteDialog
         open={deleteOpen}
         onClose={() => setDeleteOpen(false)}

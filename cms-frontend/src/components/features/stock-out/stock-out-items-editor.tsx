@@ -30,6 +30,7 @@ function formatThousands(digits: string): string {
 interface StockOutItemsEditorProps {
   items: StockOutItemDraft[];
   currency: string;
+  readOnly?: boolean;
   onAdd: (product: Product) => void;
   onChange: (
     itemId: string,
@@ -42,6 +43,7 @@ interface StockOutItemsEditorProps {
 export function StockOutItemsEditor({
   items,
   currency: curr,
+  readOnly = false,
   onAdd,
   onChange,
   onRemove,
@@ -50,10 +52,12 @@ export function StockOutItemsEditor({
 
   return (
     <div className="space-y-3">
-      <ProductSelect
-        onSelect={onAdd}
-        excludeIds={items.map((i) => i.productId)}
-      />
+      {!readOnly && (
+        <ProductSelect
+          onSelect={onAdd}
+          excludeIds={items.map((i) => i.productId)}
+        />
+      )}
 
       <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
@@ -80,6 +84,7 @@ export function StockOutItemsEditor({
                 <StockOutItemRow
                   key={item.tempId}
                   item={item}
+                  readOnly={readOnly}
                   onChange={onChange}
                   onRemove={onRemove}
                 />
@@ -109,6 +114,7 @@ export function StockOutItemsEditor({
 
 interface StockOutItemRowProps {
   item: StockOutItemDraft;
+  readOnly: boolean;
   onChange: (
     itemId: string,
     field: "quantity" | "unitPrice",
@@ -117,7 +123,12 @@ interface StockOutItemRowProps {
   onRemove: (itemId: string) => void;
 }
 
-function StockOutItemRow({ item, onChange, onRemove }: StockOutItemRowProps) {
+function StockOutItemRow({
+  item,
+  readOnly,
+  onChange,
+  onRemove,
+}: StockOutItemRowProps) {
   // State text riêng cho từng ô, không bind thẳng vào item.quantity /
   // item.unitPrice — nhờ vậy có thể xóa trắng và gõ số mới mà không bị
   // component cha (Math.max(1, value) trong stock-out-form.tsx) ép ngược
@@ -179,43 +190,55 @@ function StockOutItemRow({ item, onChange, onRemove }: StockOutItemRowProps) {
         )}
       </td>
       <td className="px-4 py-3">
-        <Input
-          type="text"
-          inputMode="numeric"
-          value={quantityText}
-          onFocus={() => {
-            quantityFocused.current = true;
-          }}
-          onChange={(e) => handleQuantityChange(e.target.value)}
-          onBlur={handleQuantityBlur}
-          className="h-8 w-20 border-slate-200 text-sm"
-        />
+        {readOnly ? (
+          <span className="text-sm text-slate-600">{item.quantity}</span>
+        ) : (
+          <Input
+            type="text"
+            inputMode="numeric"
+            value={quantityText}
+            onFocus={() => {
+              quantityFocused.current = true;
+            }}
+            onChange={(e) => handleQuantityChange(e.target.value)}
+            onBlur={handleQuantityBlur}
+            className="h-8 w-20 border-slate-200 text-sm"
+          />
+        )}
       </td>
       <td className="px-4 py-3">
-        <Input
-          type="text"
-          inputMode="numeric"
-          value={priceText}
-          onFocus={() => {
-            priceFocused.current = true;
-          }}
-          onChange={(e) => handlePriceChange(e.target.value)}
-          onBlur={handlePriceBlur}
-          className="h-8 w-28 border-slate-200 text-sm text-right tabular-nums"
-        />
+        {readOnly ? (
+          <span className="text-sm text-slate-600">
+            {currency(item.unitPrice, item.currency)}
+          </span>
+        ) : (
+          <Input
+            type="text"
+            inputMode="numeric"
+            value={priceText}
+            onFocus={() => {
+              priceFocused.current = true;
+            }}
+            onChange={(e) => handlePriceChange(e.target.value)}
+            onBlur={handlePriceBlur}
+            className="h-8 w-28 border-slate-200 text-sm text-right tabular-nums"
+          />
+        )}
       </td>
       <td className="px-4 py-3 text-sm text-slate-600">
         {currency(item.quantity * item.unitPrice, item.currency)}
       </td>
       <td className="px-4 py-3 text-right">
-        <Button
-          type="button"
-          variant="ghost"
-          className="h-8 w-8 p-0 rounded-md"
-          onClick={() => onRemove(item.tempId)}
-        >
-          <Trash2 className="h-3.5 w-3.5 text-red-600" />
-        </Button>
+        {!readOnly && (
+          <Button
+            type="button"
+            variant="ghost"
+            className="h-8 w-8 p-0 rounded-md"
+            onClick={() => onRemove(item.tempId)}
+          >
+            <Trash2 className="h-3.5 w-3.5 text-red-600" />
+          </Button>
+        )}
       </td>
     </tr>
   );

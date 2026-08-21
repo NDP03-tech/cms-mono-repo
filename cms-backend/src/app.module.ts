@@ -8,6 +8,8 @@ import { CustomersModule } from './modules/customers/infrastructure/customers.mo
 import { SuppliersModule } from './modules/suppliers/infrastructure/suppliers.module';
 import { ProductsModule } from './modules/products/infrastructure/products.module';
 import { ReportsModule } from './modules/reports/reports.module';
+import { LoggerModule } from 'nestjs-pino';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 const dbType = (
   process.env.DB_TYPE || (process.env.DB_HOST ? 'postgres' : 'sqljs')
 ).toLowerCase();
@@ -44,6 +46,29 @@ const dbConfig =
 
 @Module({
   imports: [
+    LoggerModule.forRoot({
+      pinoHttp: {
+        level: process.env.LOG_LEVEL || 'info',
+        transport:
+          process.env.NODE_ENV !== 'production'
+            ? {
+                target: 'pino-pretty',
+                options: {
+                  colorize: true,
+                  singleLine: true,
+                  translateTime: 'SYS:standard',
+                },
+              }
+            : undefined,
+        redact: ['req.headers.authorization', 'req.headers.cookie'],
+      },
+    }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 10000,
+        limit: 10,
+      },
+    ]),
     AuthModule,
     InventoryModule,
     TypeOrmModule.forRoot(dbConfig as never),

@@ -12,15 +12,6 @@ import { StockInForm } from "@/components/features/stock-in/stock-in-form";
 export default function NewStockInPage() {
   const router = useRouter();
 
-  /*
-   * Tạm thời:
-   *
-   * supplierId và createdBy phải lấy từ
-   * supplier picker + authenticated user.
-   *
-   * Không nên hard-code trong production.
-   */
-
   const supplierId = "";
   const createdBy = "";
 

@@ -16,8 +16,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InventoryBalanceTable } from "./inventory-balance-table";
 import { InventoryTransactionTable } from "./inventory-transaction-table";
 import { AdjustInventoryDialog } from "./adjust-inventory-dialog";
+import { useIsAdmin } from "@/hooks/use-current-user";
 
 export function InventoryList() {
+  const isAdmin = useIsAdmin();
   const [balances, setBalances] = useState<InventoryBalance[]>([]);
   const [transactions, setTransactions] = useState<InventoryTransaction[]>([]);
   const [isLoadingBalances, setIsLoadingBalances] = useState(true);
@@ -114,6 +116,7 @@ export function InventoryList() {
             balances={filteredBalances}
             isLoading={isLoadingBalances}
             onAdjust={setAdjustTarget}
+            canAdjust={isAdmin}
           />
         </TabsContent>
 
@@ -126,7 +129,7 @@ export function InventoryList() {
       </Tabs>
 
       <AdjustInventoryDialog
-        open={!!adjustTarget}
+        open={isAdmin && !!adjustTarget}
         onClose={() => setAdjustTarget(null)}
         balance={adjustTarget}
         onSuccess={handleAdjustSuccess}

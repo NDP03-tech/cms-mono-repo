@@ -11,9 +11,10 @@ import {
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import { StockOutStatusBadge } from "./stock-out-status-badge";
-import { StockOutItemsEditor } from "./stock-out-items-editor";
+import { StockOutDetailItemsEditor } from "./stock-out-detail-items-editor";
 import { stockOutService } from "@/services/stock-out.service";
 import type { StockOut } from "@/types/stock-out.types";
+import { useIsAdmin, useIsStaff } from "@/hooks/use-current-user";
 
 interface StockOutDetailSheetProps {
   stockOutId: string | null;
@@ -49,6 +50,8 @@ export function StockOutDetailSheet({
   const [actionLoading, setActionLoading] = useState<
     "submit" | "approve" | "reject" | null
   >(null);
+  const isAdmin = useIsAdmin();
+  const isStaff = useIsStaff();
 
   const load = useCallback(async () => {
     if (!stockOutId) return;
@@ -149,11 +152,11 @@ export function StockOutDetailSheet({
 
               <div className="space-y-2">
                 <h3 className="text-sm font-medium text-slate-900">Items</h3>
-                <StockOutItemsEditor
+                <StockOutDetailItemsEditor
                   stockOutId={stockOut.id}
                   items={stockOut.items}
                   currency={stockOut.currency}
-                  editable={stockOut.status === "draft"}
+                  editable={stockOut.status === "draft" && isStaff}
                   onChanged={handleItemsChanged}
                 />
               </div>
@@ -169,7 +172,7 @@ export function StockOutDetailSheet({
                   Add at least one item before submitting
                 </p>
               )}
-              {stockOut.status === "draft" && (
+              {stockOut.status === "draft" && isStaff && (
                 <Button
                   className="h-9 bg-slate-900 text-white hover:bg-slate-800"
                   disabled={
@@ -185,7 +188,7 @@ export function StockOutDetailSheet({
                   Submit for approval
                 </Button>
               )}
-              {stockOut.status === "pending" && canApprove && (
+              {stockOut.status === "pending" && canApprove && isAdmin && (
                 <>
                   <Button
                     variant="outline"

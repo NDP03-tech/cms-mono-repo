@@ -50,6 +50,7 @@ export class StockInController {
   // ----------------------------------------------------------------
 
   @Post()
+  @Roles(Role.STAFF)
   create(@Body() input: CreateStockInInput, @Req() req: any) {
     // Use authenticated user from JWT as the creator, ignore client-provided createdBy
     const user = req.user as any;
@@ -61,11 +62,13 @@ export class StockInController {
   }
 
   @Get()
+  @Roles(Role.ADMIN, Role.STAFF)
   list(@Query() filters: StockInFiltersInput) {
     return this.listStockIns.execute(filters);
   }
 
   @Get(':id')
+  @Roles(Role.ADMIN, Role.STAFF)
   get(@Param('id') id: string) {
     return this.getStockIn.execute(id);
   }
@@ -75,6 +78,7 @@ export class StockInController {
   // ----------------------------------------------------------------
 
   @Post(':id/items')
+  @Roles(Role.STAFF)
   async addItem(
     @Param('id') stockInId: string,
     @Body() input: CreateStockInItemInput,
@@ -84,6 +88,7 @@ export class StockInController {
   }
 
   @Patch(':id/items/:itemId')
+  @Roles(Role.STAFF)
   async updateItem(
     @Param('id') stockInId: string,
     @Param('itemId') itemId: string,
@@ -99,6 +104,7 @@ export class StockInController {
   }
 
   @Delete(':id/items/:itemId')
+  @Roles(Role.STAFF)
   async removeItem(
     @Param('id') stockInId: string,
     @Param('itemId') itemId: string,
@@ -112,6 +118,7 @@ export class StockInController {
   // ----------------------------------------------------------------
 
   @Patch(':id/submit')
+  @Roles(Role.STAFF)
   submit(@Param('id') id: string) {
     return this.submitStockIn.execute(id);
   }

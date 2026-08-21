@@ -10,6 +10,7 @@ interface ProductTableProps {
   isLoading: boolean;
   onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
+  canManage: boolean;
 }
 
 export function ProductTable({
@@ -17,6 +18,7 @@ export function ProductTable({
   isLoading,
   onEdit,
   onDelete,
+  canManage,
 }: ProductTableProps) {
   if (isLoading) {
     return (
@@ -130,18 +132,22 @@ export function ProductTable({
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-end gap-1">
-                    <button
-                      onClick={() => onEdit(product)}
-                      className="h-7 w-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                      onClick={() => onDelete(product)}
-                      className="h-7 w-7 flex items-center justify-center rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                    {canManage && (
+                      <>
+                        <button
+                          onClick={() => onEdit(product)}
+                          className="h-7 w-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          onClick={() => onDelete(product)}
+                          className="h-7 w-7 flex items-center justify-center rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </>
+                    )}
                   </div>
                 </td>
               </tr>

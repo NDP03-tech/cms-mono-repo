@@ -42,12 +42,14 @@ export class ProductsController {
   }
 
   @Get()
+  @Roles(Role.ADMIN, Role.STAFF)
   async list(@Query() filters?: ProductFiltersInput) {
     const items = await this.listUseCase.execute(filters);
     return items.map((p) => ProductOutput.from(p));
   }
 
   @Get(':id')
+  @Roles(Role.ADMIN, Role.STAFF)
   async get(@Param('id') id: string) {
     const product = await this.getUseCase.execute(id);
     if (!product) return null;

@@ -36,7 +36,7 @@ export class CustomersController {
   ) {}
 
   @Post()
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.STAFF)
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateCustomerInput) {
     const id = await this.createUseCase.execute(dto);
@@ -44,17 +44,19 @@ export class CustomersController {
   }
 
   @Get()
+  @Roles(Role.ADMIN, Role.STAFF)
   async list(@Query() filters?: CustomerFiltersInput) {
     return await this.listUseCase.execute(filters);
   }
 
   @Get(':id')
+  @Roles(Role.ADMIN, Role.STAFF)
   async getById(@Param('id') id: string) {
     return await this.getUseCase.execute(id);
   }
 
   @Put(':id')
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.STAFF)
   @HttpCode(HttpStatus.NO_CONTENT)
   async update(@Param('id') id: string, @Body() dto: UpdateCustomerInput) {
     await this.updateUseCase.execute(id, dto);

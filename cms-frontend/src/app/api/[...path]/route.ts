@@ -53,9 +53,6 @@ async function proxy(
     responseHeaders.set("content-type", responseContentType);
   }
 
-  /**
-   * 204 No Content KHÔNG được có response body.
-   */
   if (response.status === 204) {
     return new NextResponse(null, {
       status: 204,
@@ -68,16 +65,6 @@ async function proxy(
     headers: responseHeaders,
   });
 
-  /**
-   * Login thành công:
-   *
-   * NestJS trả:
-   * {
-   *   accessToken: "..."
-   * }
-   *
-   * Next.js lấy accessToken rồi lưu vào HttpOnly cookie.
-   */
   if (targetPath === "/auth/login" && response.ok) {
     try {
       const data = JSON.parse(new TextDecoder().decode(responseBody));

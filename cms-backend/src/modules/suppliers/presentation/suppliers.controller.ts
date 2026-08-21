@@ -49,11 +49,13 @@ export class SuppliersController {
   }
 
   @Get()
+  @Roles(Role.ADMIN, Role.STAFF)
   async list(@Query() filters?: SupplierFiltersInput) {
     return this.listUseCase.execute(filters);
   }
 
   @Get(':id')
+  @Roles(Role.ADMIN, Role.STAFF)
   async getById(@Param('id') id: string) {
     return this.getUseCase.execute(id);
   }

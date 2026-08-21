@@ -17,8 +17,10 @@ import { SupplierSheet } from "@/components/features/suppliers/supplier-sheet";
 import { SupplierDeleteDialog } from "@/components/features/suppliers/supplier-delete-dialog";
 import { Supplier } from "@/types/supplier.types";
 import { supplierService } from "@/services/supplier.service";
+import { useIsAdmin } from "@/hooks/use-current-user";
 
 export default function SuppliersPage() {
+  const isAdmin = useIsAdmin();
   const [allSuppliers, setAllSuppliers] = useState<Supplier[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -105,6 +107,7 @@ export default function SuppliersPage() {
           </p>
         </div>
         <Button
+          hidden={!isAdmin}
           onClick={handleAddNew}
           size="sm"
           className="h-9 bg-slate-900 hover:bg-slate-800 text-sm"
@@ -146,11 +149,12 @@ export default function SuppliersPage() {
         isLoading={isLoading}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        canManage={isAdmin}
       />
 
       {/* Sheet */}
       <SupplierSheet
-        open={sheetOpen}
+        open={isAdmin && sheetOpen}
         onClose={() => setSheetOpen(false)}
         onSuccess={handleSheetSuccess}
         supplier={editSupplier}
